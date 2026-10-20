@@ -41,12 +41,10 @@ http://localhost:5173/?movimento
 A abertura (cortina com o monograma) roda uma vez por sessão. Para rever, feche a aba
 ou rode `sessionStorage.clear()` no console.
 
-## Publicar (Vercel)
+## Publicação
 
-1. Suba o repositório para o GitHub e importe na Vercel (framework: Vite).
-2. Depois do primeiro deploy, troque em `index.html` o `og:image` para o endereço
-   completo (ex.: `https://SEU-DOMINIO/og.jpg`). WhatsApp e Instagram só mostram a
-   prévia com URL absoluta.
-3. Coloque o link no Instagram.
+No ar em **https://netofrazao.vercel.app** (projeto `neto-links` na Vercel).
+Se trocar de domínio, atualize `og:url`, `og:image`, `twitter:image` e `canonical`
+no `index.html` — WhatsApp e Instagram só mostram a prévia com URL absoluta.
 
 `vercel.json` já cuida do cache dos assets e do tipo do arquivo `.vcf`.
