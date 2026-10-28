@@ -21,6 +21,9 @@ links, projetos (com prints em `public/projetos/`), serviços e preços, tecnolo
   `portfolio: "https://netofrazao.com.br"`. O card "Portfólio completo" e os botões
   "Estudo de caso" aparecem sozinhos.
 - **"Ver no ar"** nos projetos: campo `live` de cada projeto. Sem ele, o botão some.
+- **Projeto privado** (ex.: o sistema da UPA 24h): `private: true` mostra o selo
+  "Privado", esconde qualquer link e, sem `cover`, usa a capa desenhada em CSS.
+  Há um modelo comentado no topo da lista de projetos.
 - **Salvar contato**: o cartão é o arquivo `public/neto-frazao.vcf`. Se mudar telefone
   ou e-mail, edite lá também.
 - **Horário de "Online"**: `site.hours` (horário de Breves).

@@ -115,41 +115,67 @@ export type Project = {
   hues: [string, string];
   /** Link do projeto no ar. Deixe sem para esconder o botão. */
   live?: string;
+  /**
+   * Sistema interno de cliente: ganha o selo "Sistema privado", nunca mostra
+   * link e, sem `cover`, usa a capa desenhada (nada de print com dado real).
+   */
+  private?: boolean;
   solution: { title: string; body: string }[];
   stack: string[];
   results: { value: string; label: string }[];
 };
 
 export const projects: Project[] = [
+  /*
+   * Modelo para o sistema da UPA 24h quando estiver pronto — é só tirar o
+   * comentário e ajustar o texto. `private: true` esconde qualquer link.
+   *
   {
-    slug: "mapa-burger",
-    name: "Mapa Burger",
-    kicker: "O caderno do caixa virou sistema",
+    slug: "upa-24h",
+    name: "UPA 24h Breves",
+    kicker: "…",
     year: "2026",
-    type: "Sistema de gestão",
-    client: "Hamburgueria · Breves, PA",
+    type: "Sistema de saúde",
+    client: "UPA 24h · Breves, PA",
+    summary: "…",
+    hues: ["#3fb79f", "#1d5b52"],
+    private: true,
+    solution: [{ title: "…", body: "…" }],
+    stack: ["React", "TypeScript", "Supabase"],
+    results: [{ value: "…", label: "…" }],
+  },
+  */
+  {
+    slug: "apham",
+    name: "APHAM",
+    kicker: "Site da associação com loja de vários vendedores",
+    year: "2026",
+    type: "Site + marketplace",
+    client: "Associação de handebol · Breves, PA",
     summary:
-      "Fechamento de caixa, sangria, suprimento, estoque e turnos em um só lugar. O gerente fecha o dia em três minutos e sabe exatamente onde faltou dinheiro.",
-    hues: ["#D6A756", "#8C6E2F"],
+      "O site da Associação de Praticantes de Handebol do Marajó: notícias, competições, transmissões ao vivo e uma loja onde a APHAM e outros vendedores anunciam os próprios produtos. A associação cuida de tudo por um painel, sem mexer em código.",
+    cover: "/projetos/apham.webp",
+    hues: ["#38BDF8", "#84CC16"],
+    live: "https://www.handebolmarajo.org",
     solution: [
       {
-        title: "Fechamento guiado por etapas",
-        body: "Contagem, sangrias, suprimentos e resultado. A divergência aparece na hora e exige justificativa.",
+        title: "Uma loja, vários vendedores",
+        body: "A APHAM e lojistas parceiros vendem no mesmo lugar, cada um com seus produtos. O pedido sai com PIX gerado na hora e página para acompanhar a entrega.",
       },
       {
-        title: "Vocabulário do balcão",
-        body: "Turno, sangria, suprimento. Os nomes da tela são os que a equipe já usava — treino de vinte minutos.",
+        title: "Painel para a associação",
+        body: "Novidades, eventos, produtos, pedidos e mensagens editados pelo painel — o site muda sem depender de mim.",
       },
       {
-        title: "Estoque ligado à venda",
-        body: "Baixa automática por item vendido, alerta de mínimo e histórico por fornecedor.",
+        title: "Jogo ao vivo dentro do site",
+        body: "Basta colar o link do YouTube: a transmissão aparece na página com o selo AO VIVO.",
       },
     ],
-    stack: ["Next.js", "TypeScript", "Prisma", "Supabase", "Tailwind", "Zod"],
+    stack: ["React", "Vite", "Tailwind", "Supabase", "Resend", "Vercel"],
     results: [
-      { value: "3 min", label: "para fechar o caixa" },
-      { value: "0", label: "planilhas paralelas" },
-      { value: "100%", label: "divergências justificadas" },
+      { value: "PIX", label: "pago no próprio site" },
+      { value: "Ao vivo", label: "jogos na página" },
+      { value: "Painel", label: "a associação edita tudo" },
     ],
   },
   {
@@ -228,6 +254,7 @@ export const projects: Project[] = [
     summary:
       "Galeria de ensaios, apresentação do estúdio e um caminho curto até o WhatsApp. Quem gosta do trabalho fala com o fotógrafo na mesma tela.",
     cover: "/projetos/jonatan-castro.webp",
+    live: "https://netofrazao-dev.github.io/jonatan-castro-fotografia/",
     hues: ["#E8E3DA", "#7C6A58"],
     solution: [
       {
@@ -260,6 +287,7 @@ export const projects: Project[] = [
     summary:
       "Catálogo com numeração, cor e estoque por variação, painel onde o dono configura tudo sozinho e o pedido chegando formatado no WhatsApp.",
     cover: "/projetos/king-style.webp",
+    live: "https://netofrazao-dev.github.io/KING-STYLE/",
     hues: ["#D64F7A", "#F2B33D"],
     solution: [
       {

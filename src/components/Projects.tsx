@@ -9,7 +9,7 @@ import {
   type MotionValue,
   type PanInfo,
 } from "framer-motion";
-import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, Plus } from "lucide-react";
 import { projects, type Project } from "../data/links";
 import { EASE_IN_OUT, haptic } from "../lib/utils";
 import { Cover } from "./Cover";
@@ -77,6 +77,24 @@ function Card({
           <span className="absolute left-3 top-3 rounded-full border border-white/10 bg-abyss/70 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-mist backdrop-blur-md">
             {project.type}
           </span>
+          {/* no ar (pulsando) ou sistema privado do cliente */}
+          {(project.private || project.live) && (
+            <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full border border-white/10 bg-abyss/70 px-2.5 py-1 font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-mist backdrop-blur-md">
+              {project.private ? (
+                <>
+                  <Lock size={10} className="text-brass" /> Privado
+                </>
+              ) : (
+                <>
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-pulse-dot absolute inset-0 rounded-full bg-jade" />
+                    <span className="relative h-1.5 w-1.5 rounded-full bg-jade" />
+                  </span>
+                  No ar
+                </>
+              )}
+            </span>
+          )}
 
           <div className="relative -mt-10 p-4 pt-0">
             <div className="flex items-end justify-between gap-3">

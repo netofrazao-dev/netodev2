@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useDragControls, type PanInfo } from "framer-motion";
-import { ArrowUpRight, ExternalLink, X } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Lock, X } from "lucide-react";
 import { site, whatsappLink, type Project } from "../data/links";
 import { EASE, haptic, useMedia } from "../lib/utils";
 import { Cover } from "./Cover";
@@ -213,7 +213,13 @@ export default function ProjectSheet({ project, onClose }: { project: Project | 
                     <WhatsappIcon size={18} />
                     Quero algo assim
                   </motion.a>
-                  {(project.live || site.portfolio) && (
+                  {project.private && (
+                    <p className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-line-hot px-4 py-3 text-center text-[0.8125rem] text-mist">
+                      <Lock size={14} className="shrink-0 text-brass" />
+                      Sistema interno do cliente — sem acesso público.
+                    </p>
+                  )}
+                  {!project.private && (project.live || site.portfolio) && (
                     <div className="flex gap-2.5">
                       {project.live && (
                         <a
