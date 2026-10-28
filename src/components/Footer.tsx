@@ -84,7 +84,7 @@ function Signature() {
         viewport={{ once: true, margin: "0px 0px -15% 0px" }}
         onClick={wave}
         onPointerEnter={(e) => e.pointerType === "mouse" && wave()}
-        className="mt-3 cursor-default select-none font-display text-[29cqw] font-[640] leading-[0.86] tracking-[-0.055em] text-bone"
+        className="mt-3 cursor-default select-none overflow-x-clip font-display text-[29cqw] font-[640] leading-[0.86] tracking-[-0.055em] text-bone"
         style={{ fontVariationSettings: '"opsz" 36' }}
       >
         <motion.span aria-hidden style={{ x: xTop }} className="block">

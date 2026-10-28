@@ -43,6 +43,8 @@
   }
 
   html {
+    /* no celular, overflow só no body não impede a página de alargar */
+    overflow-x: clip;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     background-color: var(--color-ink);
