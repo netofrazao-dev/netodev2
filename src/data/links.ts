@@ -312,13 +312,13 @@ export const projects: Project[] = [
     kicker: "O dono cadastra, o cliente compra",
     type: "Loja virtual",
     category: "loja",
-    client: "Loja de sandálias",
+    client: "Loja de streetwear e calçados",
     summary:
-      "Catálogo com numeração, cor e estoque por variação, painel onde o dono configura tudo sozinho e o pedido chegando formatado no WhatsApp.",
+      "Roupas, relógios e calçados num catálogo com tamanho, numeração e estoque por variação, painel onde o dono configura tudo sozinho e o pedido chegando formatado no WhatsApp.",
     cover: "/projetos/king-style.webp",
     coverSmall: "/projetos/king-style-640.webp",
-    // sem `live`: a versão no GitHub Pages está publicando o código-fonte, não o
-    // build (abre em branco). Quando estiver no ar, coloque o link aqui.
+    mobile: "/projetos/king-style-mobile.webp",
+    live: "https://king-style.netlify.app",
     hues: ["#D64F7A", "#F2B33D"],
     solution: [
       {
