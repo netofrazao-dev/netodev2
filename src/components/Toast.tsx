@@ -1,5 +1,8 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  m,
+} from "framer-motion";
 import { Check } from "lucide-react";
 
 type ToastData = {
@@ -27,27 +30,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-[85] flex justify-center px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-[85] flex justify-center px-4 pb-[calc(5.75rem+env(safe-area-inset-bottom))] lg:pb-6"
       >
         <AnimatePresence mode="popLayout">
           {toast && (
-            <motion.div
+            <m.div
               key={toast.id}
               layout
-              initial={{ y: 40, opacity: 0, scale: 0.9, filter: "blur(6px)" }}
-              animate={{ y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
-              exit={{ y: 20, opacity: 0, scale: 0.94, filter: "blur(6px)" }}
+              initial={{ y: 40, opacity: 0, scale: 0.9 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.94 }}
               transition={{ type: "spring", stiffness: 420, damping: 30 }}
-              className="pointer-events-auto flex items-center gap-3 rounded-full border border-line-hot bg-raised/90 py-2 pl-2 pr-2 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.9)] backdrop-blur-xl"
+              className="pointer-events-auto flex items-center gap-3 rounded-full border border-line-hot bg-raised/90 py-2 pl-2 pr-2 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.9)] shadow-black/60"
             >
-              <motion.span
+              <m.span
                 initial={{ scale: 0, rotate: -90 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 500, damping: 18, delay: 0.08 }}
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-jade text-abyss"
               >
                 <Check size={15} strokeWidth={3} />
-              </motion.span>
+              </m.span>
               <span className={`text-sm text-bone ${toast.action ? "" : "pr-3"}`}>{toast.message}</span>
               {toast.action && (
                 <a
@@ -57,7 +60,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   {toast.action.label}
                 </a>
               )}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

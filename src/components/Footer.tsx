@@ -1,5 +1,11 @@
 import { useRef } from "react";
-import { motion, stagger, useAnimate, useScroll, useTransform } from "framer-motion";
+import {
+  m,
+  stagger,
+  useAnimate,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { site, whatsappLink } from "../data/links";
 import { EASE, haptic, useBrevesClock } from "../lib/utils";
@@ -20,7 +26,7 @@ function WordLine({
   return (
     <span className="block overflow-hidden pb-[0.1em] pr-[0.08em] pt-[0.04em]">
       {text.split("").map((ch, i) => (
-        <motion.span
+        <m.span
           key={i}
           className="inline-block"
           variants={{
@@ -35,7 +41,7 @@ function WordLine({
           <span data-sig className={`inline-block ${italic ? "italic text-brass" : ""}`}>
             {ch}
           </span>
-        </motion.span>
+        </m.span>
       ))}
     </span>
   );
@@ -76,9 +82,8 @@ function Signature() {
         <span className="text-dim">© {new Date().getFullYear()}</span>
       </div>
 
-      <motion.p
+      <m.p
         ref={scope}
-        aria-label={site.name}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "0px 0px -15% 0px" }}
@@ -87,16 +92,17 @@ function Signature() {
         className="mt-3 cursor-default select-none overflow-x-clip font-display text-[29cqw] font-[640] leading-[0.86] tracking-[-0.055em] text-bone"
         style={{ fontVariationSettings: '"opsz" 36' }}
       >
-        <motion.span aria-hidden style={{ x: xTop }} className="block">
+        <span className="sr-only">{site.name}</span>
+        <m.span aria-hidden style={{ x: xTop }} className="block">
           <WordLine text="Neto" from={0} />
-        </motion.span>
-        <motion.span aria-hidden style={{ x: xBottom }} className="block text-right">
+        </m.span>
+        <m.span aria-hidden style={{ x: xBottom }} className="block text-right">
           <WordLine text="Frazão" from={3} italic />
-        </motion.span>
-      </motion.p>
+        </m.span>
+      </m.p>
 
       <div className="mt-6 flex items-center gap-4 border-t border-line pt-5">
-        <motion.svg
+        <m.svg
           width="44"
           height="44"
           viewBox="0 0 64 64"
@@ -108,7 +114,7 @@ function Signature() {
         >
           <g fill="none" stroke="currentColor" strokeWidth={5} strokeLinecap="square">
             {strokes.map((d, i) => (
-              <motion.path
+              <m.path
                 key={d}
                 d={d}
                 variants={{
@@ -118,7 +124,7 @@ function Signature() {
               />
             ))}
           </g>
-          <motion.circle
+          <m.circle
             cx="46"
             cy="18"
             r="4.5"
@@ -126,7 +132,7 @@ function Signature() {
             style={{ transformOrigin: "46px 18px" }}
             variants={{ hidden: { scale: 0 }, show: { scale: [0, 1.6, 1], transition: { delay: 1.05, duration: 0.5 } } }}
           />
-        </motion.svg>
+        </m.svg>
 
         <div className="min-w-0 flex-1">
           <p className="text-[0.95rem] font-medium leading-tight text-bone">
@@ -137,7 +143,7 @@ function Signature() {
           </p>
         </div>
 
-        <motion.button
+        <m.button
           type="button"
           onClick={() => {
             haptic(6);
@@ -150,7 +156,7 @@ function Signature() {
           className="group flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-brass/50 text-brass transition-colors duration-300 hover:bg-brass hover:text-abyss"
         >
           <ArrowUp size={18} className="transition-transform duration-500 group-hover:-translate-y-0.5" />
-        </motion.button>
+        </m.button>
       </div>
     </div>
   );
@@ -158,9 +164,9 @@ function Signature() {
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col gap-10 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
+    <footer id="contato" className="anchor flex flex-col gap-10 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
       {/* o convite final — com borda que gira */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 30, scale: 0.97 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true, margin: "0px 0px -10% 0px" }}
@@ -169,16 +175,16 @@ export default function Footer() {
       >
         <div
           aria-hidden
-          className="animate-spin-slow absolute left-1/2 top-1/2 aspect-square w-[220%] -translate-x-1/2 -translate-y-1/2"
+          className="animate-spin-slow absolute left-1/2 top-1/2 aspect-square w-[160%] -translate-x-1/2 -translate-y-1/2 will-change-transform"
           style={{
             background:
               "conic-gradient(from 0deg, transparent 0deg, var(--color-brass) 50deg, transparent 110deg, transparent 180deg, var(--color-jade) 230deg, transparent 290deg)",
           }}
         />
-        <div className="relative overflow-hidden rounded-[calc(1.6rem-1px)] bg-surface/95 p-6 backdrop-blur-xl">
+        <div className="relative overflow-hidden rounded-[calc(1.6rem-1px)] bg-surface p-6">
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full blur-3xl"
+            className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full"
             style={{ background: "radial-gradient(closest-side, rgba(224,172,92,0.25), transparent)" }}
           />
           <p className="eyebrow">Gostou desta página?</p>
@@ -188,7 +194,7 @@ export default function Footer() {
           <p className="mt-3 text-[0.9rem] leading-relaxed text-mist">
             Do link da bio ao sistema completo. A conversa é de graça e a proposta chega por escrito.
           </p>
-          <motion.a
+          <m.a
             href={whatsappLink("Oi, Neto! Gostei do seu link da bio e quero um assim para o meu negócio.")}
             target="_blank"
             rel="noopener noreferrer"
@@ -204,9 +210,9 @@ export default function Footer() {
             />
             <WhatsappIcon size={17} />
             Quero a minha
-          </motion.a>
+          </m.a>
         </div>
-      </motion.div>
+      </m.div>
 
       <Signature />
     </footer>

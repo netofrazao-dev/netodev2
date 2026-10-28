@@ -1,4 +1,6 @@
-import { motion } from "framer-motion";
+import {
+  m,
+} from "framer-motion";
 import { ArrowUpRight, Copy, Globe, Mail } from "lucide-react";
 import type { ReactNode } from "react";
 import { links, type LinkItem, type LinkKind } from "../data/links";
@@ -39,20 +41,19 @@ function LinkCard({ item, i }: { item: LinkItem; i: number }) {
   };
 
   return (
-    <motion.li
+    <m.li
       variants={{
-        hidden: { opacity: 0, y: 26, rotateX: -24, filter: "blur(6px)" },
+        hidden: { opacity: 0, y: 26, rotateX: -24 },
         show: {
           opacity: 1,
           y: 0,
           rotateX: 0,
-          filter: "blur(0px)",
           transition: { duration: 0.85, ease: EASE },
         },
       }}
       style={{ transformOrigin: "50% 0%", transformPerspective: 900 }}
     >
-      <motion.a
+      <m.a
         href={item.href}
         target={isMail ? undefined : "_blank"}
         rel="noopener noreferrer"
@@ -106,16 +107,16 @@ function LinkCard({ item, i }: { item: LinkItem; i: number }) {
         <span className="pointer-events-none absolute right-4 top-2 font-mono text-[0.5625rem] tracking-[0.12em] text-dim/50">
           0{i + 1}
         </span>
-      </motion.a>
-    </motion.li>
+      </m.a>
+    </m.li>
   );
 }
 
 export default function LinkList() {
   return (
-    <section aria-labelledby="links-title">
+    <section id="links" aria-labelledby="links-title" className="anchor">
       <SectionHead id="links-title" n="01" title="Onde me achar" />
-      <motion.ul
+      <m.ul
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "0px 0px -10% 0px" }}
@@ -125,7 +126,7 @@ export default function LinkList() {
         {links.map((item, i) => (
           <LinkCard key={item.kind} item={item} i={i} />
         ))}
-      </motion.ul>
+      </m.ul>
     </section>
   );
 }

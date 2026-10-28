@@ -12,6 +12,9 @@ export const site = {
   coords: "01°40′56″S · 50°28′48″O",
   timeZone: "America/Belem",
 
+  /** Endereço público desta página (usado no QR Code e no compartilhar). */
+  url: "https://netofrazao.vercel.app",
+
   whatsapp: "5591992625811",
   email: "frazaoneto307@gmail.com",
   github: "https://github.com/netofrazao-dev",
@@ -29,10 +32,18 @@ export const site = {
   /** Cartão de contato em /public. Se mudar telefone ou e-mail, edite lá também. */
   vcard: "/neto-frazao.vcf",
 
+  /** Foto em três tamanhos (o navegador escolhe o menor que fica nítido). */
   photo: "/neto.webp",
+  photoSet: "/neto-240.webp 240w, /neto-360.webp 360w, /neto.webp 480w",
 
   /** Janela em que você costuma responder rápido (horário de Breves). */
   hours: { from: 8, to: 21 },
+
+  /**
+   * O que você está fazendo agora — aparece num card "AGORA" no topo.
+   * Deixe "" para esconder.
+   */
+  now: "Finalizando um sistema para a UPA 24h de Breves",
 } as const;
 
 export function whatsappLink(message: string) {
@@ -49,15 +60,9 @@ export const heroNouns = [
   "a sua loja de roupas",
   "o seu restaurante",
   "a sua barbearia",
+  "o seu açaí",
   "a sua farmácia",
-  "a sua distribuidora",
   "a sua pousada",
-] as const;
-
-export const proof = [
-  { num: 3, suffix: "", label: "sistemas em produção" },
-  { num: 2, suffix: "h", label: "para responder" },
-  { num: 30, suffix: "d", label: "de ajuste inclusos" },
 ] as const;
 
 export type LinkKind = "instagram" | "portfolio" | "github" | "email";
@@ -102,22 +107,39 @@ export const links: LinkItem[] = [
   },
 ].filter((l) => l.href !== "") as LinkItem[];
 
+/* ------------------------------------------------------------------ */
+/* projetos                                                            */
+/* ------------------------------------------------------------------ */
+
+export type Category = "site" | "loja" | "sistema";
+
+export const categories: { id: Category | "todos"; label: string }[] = [
+  { id: "todos", label: "Todos" },
+  { id: "site", label: "Sites" },
+  { id: "loja", label: "Lojas" },
+  { id: "sistema", label: "Sistemas" },
+];
+
 export type Project = {
   slug: string;
   name: string;
   kicker: string;
-  year: string;
   type: string;
+  category: Category;
   client: string;
   summary: string;
-  /** Print em /public/projetos. Sem isso, entra uma capa desenhada em CSS. */
+  /** Print do computador em /public/projetos (1000px de largura). */
   cover?: string;
+  /** Mesmo print com 640px — o celular baixa este. Opcional. */
+  coverSmall?: string;
+  /** Print do celular (página rolável dentro do telefone). Opcional. */
+  mobile?: string;
   hues: [string, string];
   /** Link do projeto no ar. Deixe sem para esconder o botão. */
   live?: string;
   /**
-   * Sistema interno de cliente: ganha o selo "Sistema privado", nunca mostra
-   * link e, sem `cover`, usa a capa desenhada (nada de print com dado real).
+   * Sistema interno de cliente: ganha o selo "Privado", nunca mostra link e,
+   * sem `cover`, usa a capa desenhada (nada de print com dado real).
    */
   private?: boolean;
   solution: { title: string; body: string }[];
@@ -134,8 +156,8 @@ export const projects: Project[] = [
     slug: "upa-24h",
     name: "UPA 24h Breves",
     kicker: "…",
-    year: "2026",
     type: "Sistema de saúde",
+    category: "sistema",
     client: "UPA 24h · Breves, PA",
     summary: "…",
     hues: ["#3fb79f", "#1d5b52"],
@@ -149,12 +171,14 @@ export const projects: Project[] = [
     slug: "apham",
     name: "APHAM",
     kicker: "Site da associação com loja de vários vendedores",
-    year: "2026",
     type: "Site + marketplace",
+    category: "loja",
     client: "Associação de handebol · Breves, PA",
     summary:
       "O site da Associação de Praticantes de Handebol do Marajó: notícias, competições, transmissões ao vivo e uma loja onde a APHAM e outros vendedores anunciam os próprios produtos. A associação cuida de tudo por um painel, sem mexer em código.",
     cover: "/projetos/apham.webp",
+    coverSmall: "/projetos/apham-640.webp",
+    mobile: "/projetos/apham-mobile.webp",
     hues: ["#38BDF8", "#84CC16"],
     live: "https://www.handebolmarajo.org",
     solution: [
@@ -182,12 +206,14 @@ export const projects: Project[] = [
     slug: "diversus-shop",
     name: "Diversus Shop",
     kicker: "Uma loja que vende de madrugada",
-    year: "2025",
     type: "Loja virtual",
+    category: "loja",
     client: "Loja de acessórios · Breves, PA",
     summary:
       "Catálogo completo, carrinho, PIX com QR Code e o pedido chegando formatado no WhatsApp da loja. Estoque controlado direto no banco de dados.",
     cover: "/projetos/diversus-shop.webp",
+    coverSmall: "/projetos/diversus-shop-640.webp",
+    mobile: "/projetos/diversus-shop-mobile.webp",
     hues: ["#7B5CD6", "#3E9C8F"],
     live: "https://diversus-shop.vercel.app",
     solution: [
@@ -215,12 +241,14 @@ export const projects: Project[] = [
     slug: "estante-livre",
     name: "Estante Livre",
     kicker: "Aluguel de livros com régua financeira",
-    year: "2025",
     type: "Plataforma completa",
+    category: "sistema",
     client: "Livraria física · Breves, PA",
     summary:
       "Portal do leitor, backoffice do dono, multa por atraso, aviso automático por e-mail e LGPD. Uma livraria de bairro com sistema de biblioteca grande.",
     cover: "/projetos/estante-livre.webp",
+    coverSmall: "/projetos/estante-livre-640.webp",
+    mobile: "/projetos/estante-livre-mobile.webp",
     hues: ["#3E9C8F", "#D6A756"],
     live: "https://estande-livre.vercel.app",
     solution: [
@@ -248,12 +276,13 @@ export const projects: Project[] = [
     slug: "jonatan-castro-fotografia",
     name: "Jonatan Castro",
     kicker: "O portfólio que fecha o ensaio na conversa",
-    year: "2026",
     type: "Site com portfólio",
+    category: "site",
     client: "Estúdio fotográfico",
     summary:
       "Galeria de ensaios, apresentação do estúdio e um caminho curto até o WhatsApp. Quem gosta do trabalho fala com o fotógrafo na mesma tela.",
     cover: "/projetos/jonatan-castro.webp",
+    coverSmall: "/projetos/jonatan-castro-640.webp",
     live: "https://netofrazao-dev.github.io/jonatan-castro-fotografia/",
     hues: ["#E8E3DA", "#7C6A58"],
     solution: [
@@ -281,13 +310,15 @@ export const projects: Project[] = [
     slug: "king-style",
     name: "King Style",
     kicker: "O dono cadastra, o cliente compra",
-    year: "2026",
     type: "Loja virtual",
+    category: "loja",
     client: "Loja de sandálias",
     summary:
       "Catálogo com numeração, cor e estoque por variação, painel onde o dono configura tudo sozinho e o pedido chegando formatado no WhatsApp.",
     cover: "/projetos/king-style.webp",
-    live: "https://netofrazao-dev.github.io/KING-STYLE/",
+    coverSmall: "/projetos/king-style-640.webp",
+    // sem `live`: a versão no GitHub Pages está publicando o código-fonte, não o
+    // build (abre em branco). Quando estiver no ar, coloque o link aqui.
     hues: ["#D64F7A", "#F2B33D"],
     solution: [
       {
@@ -312,58 +343,15 @@ export const projects: Project[] = [
   },
 ];
 
-export type Service = {
-  id: string;
-  title: string;
-  pitch: string;
-  includes: string[];
-  from: number;
-  deadline: string;
-};
-
-export const services: Service[] = [
+/** Números do topo. "Projetos no ar" é contado sozinho a partir da lista. */
+export const proof = [
   {
-    id: "site",
-    title: "Site institucional",
-    pitch:
-      "Seu negócio no Google, com uma página que abre rápido até no 4G daqui e leva o cliente direto pro seu WhatsApp.",
-    includes: [
-      "Design exclusivo, feito pro seu ramo",
-      "Botão de WhatsApp em toda a página",
-      "Cadastro no Google Meu Negócio",
-      "Domínio próprio (seunegocio.com.br)",
-    ],
-    from: 350,
-    deadline: "1 a 2 semanas",
+    num: projects.filter((p) => p.live && !p.private).length,
+    suffix: "",
+    label: "projetos no ar",
   },
-  {
-    id: "loja",
-    title: "Loja virtual",
-    pitch:
-      "Catálogo organizado, carrinho, PIX na hora e o pedido caindo pronto no seu WhatsApp, com endereço e tudo.",
-    includes: [
-      "Catálogo com fotos, preços e estoque",
-      "Pagamento por PIX com QR Code",
-      "Pedido formatado direto no WhatsApp",
-      "Painel para você cadastrar produtos",
-    ],
-    from: 520,
-    deadline: "2 a 3 semanas",
-  },
-  {
-    id: "sistema",
-    title: "Sistema sob medida",
-    pitch:
-      "Aquilo que hoje é planilha, caderno ou combinado de cabeça vira um sistema que qualquer funcionário consegue usar.",
-    includes: [
-      "Fechamento de caixa, sangria e suprimento",
-      "Controle de estoque e fornecedores",
-      "Relatórios que mostram onde está o lucro",
-      "Acessos separados por função",
-    ],
-    from: 700,
-    deadline: "3 a 6 semanas",
-  },
+  { num: 2, suffix: "h", label: "para responder" },
+  { num: 30, suffix: "d", label: "de ajuste inclusos" },
 ];
 
 export const stack = [

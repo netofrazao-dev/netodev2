@@ -2,30 +2,28 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#04080c" />
     <meta name="color-scheme" content="dark" />
     <link rel="canonical" href="https://netofrazao.vercel.app/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.jpg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Neto Frazão" />
 
     <title>Neto Frazão · Sites e sistemas no Marajó</title>
     <meta
       name="description"
-      content="Desenvolvedor web em Breves, Pará. Sites, lojas virtuais e sistemas sob medida para o comércio do Marajó. Orçamento pelo WhatsApp em até 2 horas."
+      content="Desenvolvedor web em Breves, Pará. Sites, lojas virtuais e sistemas sob medida para o comércio do Marajó. Simule o site do seu negócio, monte um orçamento e fale comigo pelo WhatsApp."
     />
 
     <meta property="og:type" content="profile" />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:site_name" content="Neto Frazão" />
     <meta property="og:title" content="Neto Frazão · Sites e sistemas no Marajó" />
-    <meta
-      property="og:description"
-      content="Sites, lojas virtuais e sistemas sob medida. Feitos aqui, para daqui."
-    />
+    <meta property="og:description" content="Sites, lojas virtuais e sistemas sob medida. Feitos aqui, para daqui." />
     <meta property="og:url" content="https://netofrazao.vercel.app/" />
     <meta property="og:image" content="https://netofrazao.vercel.app/og.jpg" />
     <meta property="og:image:width" content="1200" />
@@ -33,20 +31,103 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://netofrazao.vercel.app/og.jpg" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- fontes da própria página (sem ida ao Google): as duas do topo chegam primeiro -->
+    <link rel="preload" href="/src/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/src/assets/fonts/inter-tight.woff2" as="font" type="font/woff2" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter+Tight:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="image"
+      href="/neto-240.webp"
+      imagesrcset="/neto-240.webp 240w, /neto-360.webp 360w, /neto.webp 480w"
+      imagesizes="116px"
+      fetchpriority="high"
     />
-    <link rel="preload" as="image" href="/neto.webp" fetchpriority="high" />
+
+    <script>
+      // decide antes da primeira pintura: abertura só na primeira visita da sessão
+      (function () {
+        try {
+          var d = document.documentElement;
+          var forced = /[?&]movimento/.test(location.search);
+          if (forced) d.classList.add("motion-full");
+          var reduced = !forced && matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (reduced || sessionStorage.getItem("nf:intro") === "1") d.classList.add("no-splash");
+        } catch (e) {}
+      })();
+    </script>
+
+    <style>
+      html { background: #04080c; }
+      #splash { position: fixed; inset: 0; z-index: 100; cursor: pointer; }
+      .no-splash #splash { display: none; }
+      .sp-half { position: absolute; left: 0; right: 0; height: 50.5%; background: #02050a;
+        transition: transform 0.85s cubic-bezier(0.83, 0, 0.17, 1) 0.06s; }
+      .sp-top { top: 0; } .sp-bot { bottom: 0; }
+      #splash.open .sp-top { transform: translateY(-100%); }
+      #splash.open .sp-bot { transform: translateY(100%); }
+      .sp-seam { position: absolute; left: 0; right: 0; top: 50%; height: 1px; transform: scaleX(0); opacity: 0;
+        background: linear-gradient(90deg, transparent, #e0ac5c, transparent);
+        animation: sp-seam 0.9s cubic-bezier(0.83, 0, 0.17, 1) 0.15s forwards; }
+      #splash.open .sp-seam { animation: sp-seam-out 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      .sp-mark { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; gap: 62px; transition: opacity 0.4s, transform 0.4s; }
+      #splash.open .sp-mark { opacity: 0; transform: scale(0.86); }
+      .sp-mark svg { filter: drop-shadow(0 0 18px rgba(224, 172, 92, 0.45)); }
+      .sp-mark path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sp-draw 0.38s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+      .sp-mark path:nth-child(2) { animation-delay: 0.2s; }
+      .sp-mark path:nth-child(3) { animation-delay: 0.4s; }
+      .sp-dot { transform-origin: 46px 18px; transform: scale(0); animation: sp-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.68s forwards; }
+      .sp-label { font: 500 10px/1 ui-monospace, monospace; letter-spacing: 0.3em; text-transform: uppercase; color: #7c8d90; }
+      @keyframes sp-draw { to { stroke-dashoffset: 0; } }
+      @keyframes sp-pop { 60% { transform: scale(1.6); } to { transform: scale(1); } }
+      @keyframes sp-seam { to { transform: scaleX(1); opacity: 0.9; } }
+      @keyframes sp-seam-out { from { transform: scaleX(1); opacity: 0.9; } to { transform: scaleX(1.4); opacity: 0; } }
+      /* rede de segurança: se o JavaScript não chegar, a cortina some sozinha */
+      #splash { animation: sp-fallback 0.6s ease 7s forwards; }
+      @keyframes sp-fallback { to { opacity: 0; visibility: hidden; } }
+    </style>
+    <noscript><style>#splash { display: none; }</style></noscript>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Neto Frazão — Desenvolvimento web",
+        "description": "Sites, lojas virtuais e sistemas sob medida para o comércio de Breves e do Marajó.",
+        "url": "https://netofrazao.vercel.app/",
+        "image": "https://netofrazao.vercel.app/og.jpg",
+        "telephone": "+55 91 99262-5811",
+        "email": "frazaoneto307@gmail.com",
+        "founder": { "@type": "Person", "name": "Neto Frazão", "jobTitle": "Desenvolvedor web e de sistemas" },
+        "address": { "@type": "PostalAddress", "addressLocality": "Breves", "addressRegion": "PA", "addressCountry": "BR" },
+        "areaServed": [{ "@type": "City", "name": "Breves" }, { "@type": "AdministrativeArea", "name": "Marajó, Pará" }],
+        "sameAs": ["https://www.instagram.com/sites.neto_dev/", "https://github.com/netofrazao-dev"],
+        "priceRange": "R$ 350 – R$ 1.500",
+        "knowsLanguage": "pt-BR"
+      }
+    </script>
   </head>
   <body>
+    <div id="splash" aria-hidden="true">
+      <div class="sp-half sp-top"></div>
+      <div class="sp-half sp-bot"></div>
+      <div class="sp-seam"></div>
+      <div class="sp-mark">
+        <svg width="76" height="76" viewBox="0 0 64 64">
+          <g fill="none" stroke="#e0ac5c" stroke-width="5" stroke-linecap="square">
+            <path pathLength="1" d="M18 46V18" />
+            <path pathLength="1" d="M18 18l28 28" />
+            <path pathLength="1" d="M46 46V18" />
+          </g>
+          <circle class="sp-dot" cx="46" cy="18" r="4.5" fill="#3fb79f" />
+        </svg>
+        <span class="sp-label">Breves · Marajó</span>
+      </div>
+    </div>
     <div id="root"></div>
     <noscript>
       <p style="padding: 2rem; font-family: sans-serif; color: #e9f0ef">
-        Neto Frazão — WhatsApp (91) 99262-5811 · frazaoneto307@gmail.com ·
-        instagram.com/sites.neto_dev
+        Neto Frazão — WhatsApp (91) 99262-5811 · frazaoneto307@gmail.com · instagram.com/sites.neto_dev
       </p>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>

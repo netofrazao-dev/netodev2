@@ -1,6 +1,11 @@
 import { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { prefersReducedMotion } from "../lib/utils";
+import {
+  m,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { overlayStore } from "../lib/overlay";
+import { prefersReducedMotion, whenIdle } from "../lib/utils";
 
 type Pt = { x: number; y: number };
 type Branch = { pts: Pt[]; depth: number };
@@ -52,10 +57,27 @@ function growDelta(maxDepth: number, trunks: number, budget0: number, split: num
   return { branches, nodes };
 }
 
+/** Brilho redondo desenhado uma vez e carimbado depois (bem mais barato). */
+function makeGlow(color: string, r: number) {
+  const c = document.createElement("canvas");
+  c.width = c.height = r * 2;
+  const g = c.getContext("2d")!;
+  const grad = g.createRadialGradient(r, r, 0, r, r, r);
+  grad.addColorStop(0, `rgba(${color},0.32)`);
+  grad.addColorStop(1, `rgba(${color},0)`);
+  g.fillStyle = grad;
+  g.fillRect(0, 0, r * 2, r * 2);
+  return c;
+}
+
 /**
  * Fundo vivo: o delta do Marajó como placa de circuito. No celular (retrato)
  * o rio desce de cima para baixo; rolar a página acelera os pulsos e tocar
  * na tela solta uma onda de sonar.
+ *
+ * Leveza: resolução 1x no celular, ~40 quadros por segundo, brilhos
+ * pré-desenhados, pausa com a aba escondida ou gaveta aberta, e só começa
+ * depois que a página terminou de carregar.
  */
 function DeltaField() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -68,14 +90,12 @@ function DeltaField() {
     // "reduzir movimento": o rio continua, só que lento, sem sonar e sem correnteza da rolagem
     const calm = prefersReducedMotion();
     const small = window.matchMedia("(max-width: 767px)").matches;
+    const frameGap = small ? 24 : 15; // ms entre quadros (~40 fps no celular)
 
-    const { branches, nodes } = growDelta(
-      small ? 3 : 4,
-      small ? 3 : 4,
-      small ? 42 : 46,
-      small ? 0.12 : 0.13,
-      small ? 46 : 96,
-    );
+    const { branches, nodes } = growDelta(small ? 3 : 4, small ? 3 : 4, small ? 42 : 46, small ? 0.12 : 0.13, small ? 40 : 90);
+
+    const COLORS = ["224,172,92", "63,183,159"] as const;
+    const glows = COLORS.map((c) => makeGlow(c, 22));
 
     let w = 0;
     let h = 0;
@@ -84,9 +104,18 @@ function DeltaField() {
     const layer = document.createElement("canvas");
     const lctx = layer.getContext("2d");
 
-    /** De espaço do rio para pixels da tela. */
     const X = (p: Pt) => (vertical ? p.y * w : p.x * w);
     const Y = (p: Pt) => (vertical ? p.x * h : p.y * h);
+
+    // esmaecimento das bordas (antes era uma máscara CSS aplicada a cada quadro;
+    // agora é calculado aqui: elipse 140% × 90% centrada em 50% / 30%)
+    const fade = (px: number, py: number) => {
+      const d = Math.hypot((px - w * 0.5) / (w * 1.4), (py - h * 0.3) / (h * 0.9));
+      if (d <= 0.2) return 1;
+      if (d <= 0.6) return 1 - ((d - 0.2) / 0.4) * 0.5;
+      if (d <= 1) return 0.5 * (1 - (d - 0.6) / 0.4);
+      return 0;
+    };
 
     const pointer = { x: 0, y: 0, active: false };
     const rings: Ring[] = [];
@@ -94,7 +123,9 @@ function DeltaField() {
     let boost = 1;
     let lastScroll = window.scrollY;
     let raf = 0;
+    let last = 0;
     let running = false;
+    let started = false;
 
     const paintStatic = () => {
       if (!lctx) return;
@@ -113,25 +144,35 @@ function DeltaField() {
         }
         lctx.lineWidth = Math.max(0.6, 2.2 - b.depth * 0.5);
         lctx.strokeStyle =
-          b.depth === 0
-            ? "rgba(224,172,92,0.18)"
-            : b.depth === 1
-              ? "rgba(63,183,159,0.15)"
-              : "rgba(144,163,165,0.08)";
+          b.depth === 0 ? "rgba(224,172,92,0.2)" : b.depth === 1 ? "rgba(63,183,159,0.16)" : "rgba(144,163,165,0.09)";
         lctx.stroke();
       }
-      for (const n of nodes) {
-        lctx.beginPath();
-        lctx.arc(X(n), Y(n), 1.6, 0, Math.PI * 2);
-        lctx.fillStyle = "rgba(224,172,92,0.3)";
-        lctx.fill();
-      }
+      lctx.fillStyle = "rgba(224,172,92,0.32)";
+      for (const n of nodes) lctx.fillRect(X(n) - 1.5, Y(n) - 1.5, 3, 3);
+
+      // aplica o esmaecimento uma vez só, na camada estática
+      lctx.save();
+      lctx.globalCompositeOperation = "destination-in";
+      lctx.setTransform(dpr * w * 1.4, 0, 0, dpr * h * 0.9, dpr * w * 0.5, dpr * h * 0.3);
+      const g = lctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+      g.addColorStop(0.2, "rgba(0,0,0,1)");
+      g.addColorStop(0.6, "rgba(0,0,0,0.5)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      lctx.fillStyle = g;
+      lctx.fillRect(-2, -2, 4, 4);
+      lctx.restore();
+    };
+
+    const drawStill = () => {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(layer, 0, 0, w, h);
     };
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      dpr = Math.min(window.devicePixelRatio || 1, small ? 1.75 : 2);
+      dpr = small ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
       w = rect.width;
       h = rect.height;
       vertical = h > w * 1.05;
@@ -139,12 +180,8 @@ function DeltaField() {
       canvas.height = Math.round(h * dpr);
       layer.width = canvas.width;
       layer.height = canvas.height;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       paintStatic();
-      if (!running) {
-        ctx.clearRect(0, 0, w, h);
-        ctx.drawImage(layer, 0, 0, w, h);
-      }
+      if (!running) drawStill();
     };
 
     const along = (b: Branch, t: number): Pt => {
@@ -156,32 +193,36 @@ function DeltaField() {
       return { x: a.x + (c.x - a.x) * k, y: a.y + (c.y - a.y) * k };
     };
 
-    const max = small ? 9 : 14;
+    const max = small ? 8 : 14;
     for (let i = 0; i < max; i++) {
       pulses.push({
         branch: Math.floor(Math.random() * branches.length),
         t: -Math.random() * 0.8,
-        speed: 0.0016 + Math.random() * 0.003,
+        speed: 0.0019 + Math.random() * 0.0034,
         hue: Math.random() < 0.6 ? 0 : 1,
       });
     }
 
     const frame = (now: number) => {
       if (!running) return;
+      raf = requestAnimationFrame(frame);
+      if (now - last < frameGap) return;
+      const step = Math.min(2.5, (now - last) / 16.7);
+      last = now;
 
-      // rolar a página empurra a correnteza
       const sy = window.scrollY;
       const v = Math.abs(sy - lastScroll);
       lastScroll = sy;
       const target = calm ? 0.4 : 1 + Math.min(v * 0.09, 5);
       boost += (target - boost) * 0.12;
 
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
       ctx.drawImage(layer, 0, 0, w, h);
       ctx.globalCompositeOperation = "lighter";
 
       for (const p of pulses) {
-        p.t += p.speed * boost;
+        p.t += p.speed * boost * step;
         const b = branches[p.branch];
         if (!b) continue;
         if (p.t > 1.2) {
@@ -191,27 +232,27 @@ function DeltaField() {
           continue;
         }
         if (p.t < 0) continue;
-        const color = p.hue === 0 ? "224,172,92" : "63,183,159";
-        for (let s = 8; s >= 0; s--) {
-          const tt = p.t - s * 0.014 * Math.min(boost, 2.4);
+        const color = COLORS[p.hue];
+        const headPt = along(b, p.t);
+        const f = fade(X(headPt), Y(headPt));
+        if (f <= 0.01) continue;
+        ctx.fillStyle = `rgb(${color})`;
+        for (let s = 6; s >= 1; s--) {
+          const tt = p.t - s * 0.016 * Math.min(boost, 2.4);
           if (tt < 0) continue;
           const pos = along(b, tt);
-          ctx.beginPath();
-          ctx.arc(X(pos), Y(pos), s === 0 ? 2.1 : 1.4, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${color},${(1 - s / 9) * 0.55})`;
-          ctx.fill();
+          ctx.globalAlpha = (1 - s / 7) * 0.5 * f;
+          ctx.fillRect(X(pos) - 1, Y(pos) - 1, 2, 2);
         }
-        const head = along(b, p.t);
-        const hx = X(head);
-        const hy = Y(head);
-        const g = ctx.createRadialGradient(hx, hy, 0, hx, hy, 24);
-        g.addColorStop(0, `rgba(${color},0.26)`);
-        g.addColorStop(1, `rgba(${color},0)`);
-        ctx.fillStyle = g;
-        ctx.fillRect(hx - 24, hy - 24, 48, 48);
+        const hx = X(headPt);
+        const hy = Y(headPt);
+        ctx.globalAlpha = 0.9 * f;
+        ctx.fillRect(hx - 1.5, hy - 1.5, 3, 3);
+        ctx.globalAlpha = f;
+        ctx.drawImage(glows[p.hue], hx - 22, hy - 22);
+        ctx.globalAlpha = 1;
       }
 
-      // sonar do toque
       for (let i = rings.length - 1; i >= 0; i--) {
         const r = rings[i];
         const k = (now - r.born) / 1100;
@@ -220,42 +261,43 @@ function DeltaField() {
           continue;
         }
         const e = 1 - Math.pow(1 - k, 3);
-        for (const [mult, col] of [
-          [1, "224,172,92"],
-          [0.62, "63,183,159"],
-        ] as const) {
-          ctx.beginPath();
-          ctx.arc(r.x, r.y, 8 + e * 150 * mult, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(${col},${(1 - k) * 0.5})`;
-          ctx.lineWidth = 1.2;
-          ctx.stroke();
-        }
+        ctx.lineWidth = 1.2;
+        ctx.globalAlpha = (1 - k) * 0.5;
+        ctx.strokeStyle = `rgb(${COLORS[0]})`;
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, 8 + e * 150, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = `rgb(${COLORS[1]})`;
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, 8 + e * 93, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
       }
 
-      // lanterna do cursor (desktop)
       if (pointer.active) {
         const r = 240;
         const g = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, r);
-        g.addColorStop(0, "rgba(224,172,92,0.10)");
-        g.addColorStop(0.5, "rgba(63,183,159,0.04)");
+        g.addColorStop(0, "rgba(224,172,92,0.09)");
+        g.addColorStop(0.5, "rgba(63,183,159,0.035)");
         g.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = g;
         ctx.fillRect(pointer.x - r, pointer.y - r, r * 2, r * 2);
       }
 
       ctx.globalCompositeOperation = "source-over";
-      raf = requestAnimationFrame(frame);
     };
 
-    const start = () => {
-      if (running) return;
-      running = true;
-      lastScroll = window.scrollY;
-      raf = requestAnimationFrame(frame);
-    };
-    const stop = () => {
-      running = false;
-      cancelAnimationFrame(raf);
+    const shouldRun = () => started && !document.hidden && overlayStore.get() === 0;
+    const sync = () => {
+      if (shouldRun() && !running) {
+        running = true;
+        last = 0;
+        lastScroll = window.scrollY;
+        raf = requestAnimationFrame(frame);
+      } else if (!shouldRun() && running) {
+        running = false;
+        cancelAnimationFrame(raf);
+      }
     };
 
     const onMove = (e: PointerEvent) => {
@@ -265,36 +307,52 @@ function DeltaField() {
       pointer.active = true;
     };
     const onDown = (e: PointerEvent) => {
-      if (calm) return;
+      if (calm || !running) return;
       rings.push({ x: e.clientX, y: e.clientY, born: performance.now() });
-      if (rings.length > 6) rings.shift();
+      if (rings.length > 5) rings.shift();
     };
     const onLeave = () => {
       pointer.active = false;
     };
-    const onVis = () => (document.hidden ? stop() : start());
 
-    resize();
+    // o ResizeObserver já dispara uma vez sozinho — sem leitura forçada na montagem
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
-    start();
+    // o rio só acende quando a página já está pronta
+    const begin = () => {
+      started = true;
+      canvas.style.opacity = "1";
+      sync();
+    };
+    if (document.readyState === "complete") whenIdle(begin, 1200);
+    else window.addEventListener("load", () => whenIdle(begin, 1200), { once: true });
+
+    const unsub = overlayStore.subscribe(sync);
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
     document.documentElement.addEventListener("pointerleave", onLeave);
-    document.addEventListener("visibilitychange", onVis);
+    document.addEventListener("visibilitychange", sync);
 
     return () => {
-      stop();
+      running = false;
+      cancelAnimationFrame(raf);
       ro.disconnect();
+      unsub();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       document.documentElement.removeEventListener("pointerleave", onLeave);
-      document.removeEventListener("visibilitychange", onVis);
+      document.removeEventListener("visibilitychange", sync);
     };
   }, []);
 
-  return <canvas ref={ref} aria-hidden className="h-full w-full" />;
+  return (
+    <canvas
+      ref={ref}
+      aria-hidden
+      className="h-full w-full opacity-0 transition-opacity duration-[1600ms] ease-out"
+    />
+  );
 }
 
 export default function Backdrop() {
@@ -306,33 +364,26 @@ export default function Backdrop() {
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       <div className="absolute inset-0 bg-ink" />
 
-      {/* auroras de latão e jade */}
-      <motion.div style={{ y: auroraY }} className="absolute inset-0">
+      {/* auroras: gradientes já são macios — sem filtro de desfoque (caro no celular) */}
+      <m.div style={{ y: auroraY }} className="absolute inset-0 will-change-transform">
         <div
-          className="animate-drift absolute -left-1/4 -top-1/4 h-[80vh] w-[90vw] rounded-full opacity-70 blur-3xl"
-          style={{ background: "radial-gradient(closest-side, rgba(224,172,92,0.16), transparent)" }}
+          className="animate-drift absolute -left-1/4 -top-1/4 h-[80vh] w-[100vw] rounded-full"
+          style={{ background: "radial-gradient(closest-side, rgba(224,172,92,0.13), transparent)" }}
         />
-      </motion.div>
-      <motion.div style={{ y: jadeY }} className="absolute inset-0">
+      </m.div>
+      <m.div style={{ y: jadeY }} className="absolute inset-0 will-change-transform">
         <div
-          className="animate-drift-slow absolute -right-1/3 top-1/3 h-[70vh] w-[90vw] rounded-full opacity-70 blur-3xl"
-          style={{ background: "radial-gradient(closest-side, rgba(63,183,159,0.13), transparent)" }}
+          className="animate-drift-slow absolute -right-1/3 top-1/3 h-[70vh] w-[100vw] rounded-full"
+          style={{ background: "radial-gradient(closest-side, rgba(63,183,159,0.1), transparent)" }}
         />
-      </motion.div>
+      </m.div>
 
       <div className="blueprint" />
 
-      <div
-        className="absolute inset-x-0 top-0 h-[100lvh]"
-        style={{
-          maskImage: "radial-gradient(140% 90% at 50% 30%, black 20%, rgba(0,0,0,0.5) 60%, transparent 100%)",
-          WebkitMaskImage: "radial-gradient(140% 90% at 50% 30%, black 20%, rgba(0,0,0,0.5) 60%, transparent 100%)",
-        }}
-      >
+      <div className="absolute inset-x-0 top-0 h-[100lvh]">
         <DeltaField />
       </div>
 
-      {/* vinheta para o conteúdo respirar */}
       <div
         className="absolute inset-0"
         style={{ background: "radial-gradient(120% 70% at 50% 40%, transparent 40%, rgba(2,5,10,0.75) 100%)" }}

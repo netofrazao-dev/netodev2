@@ -9,12 +9,21 @@ export const EASE = [0.16, 1, 0.3, 1] as const;
 export const EASE_IN_OUT = [0.83, 0, 0.17, 1] as const;
 
 /** Toque curto no celular (Android). No iPhone simplesmente não faz nada. */
-export function haptic(ms = 8) {
+export function haptic(ms: number | number[] = 8) {
   try {
     navigator.vibrate?.(ms);
   } catch {
     /* sem vibração, sem problema */
   }
+}
+
+/** Roda quando o navegador estiver folgado (ou em até `timeout` ms). */
+export function whenIdle(fn: () => void, timeout = 1500) {
+  const w = window as Window & {
+    requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+  };
+  if (w.requestIdleCallback) w.requestIdleCallback(fn, { timeout });
+  else window.setTimeout(fn, 300);
 }
 
 export async function copyText(text: string) {
@@ -30,23 +39,22 @@ export async function copyText(text: string) {
     ta.style.opacity = "0";
     document.body.appendChild(ta);
     ta.select();
-    const ok = document.execCommand("copy");
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch {
+      ok = false;
+    }
     ta.remove();
     return ok;
   }
 }
 
-/** Compartilha esta página. Retorna "shared", "copied" ou "failed". */
-export async function shareSelf() {
-  const url = window.location.origin + window.location.pathname;
-  const data = {
-    title: `${site.name} · Sites e sistemas`,
-    text: "Sites, lojas virtuais e sistemas sob medida no Marajó.",
-    url,
-  };
+/** Compartilha um endereço. Retorna "shared", "copied" ou "failed". */
+export async function shareUrl(url: string, title: string, text: string) {
   if (navigator.share) {
     try {
-      await navigator.share(data);
+      await navigator.share({ title, text, url });
       return "shared" as const;
     } catch (e) {
       if ((e as Error).name === "AbortError") return "shared" as const;
@@ -54,6 +62,12 @@ export async function shareSelf() {
   }
   return (await copyText(url)) ? ("copied" as const) : ("failed" as const);
 }
+
+export const pageUrl = () =>
+  typeof window === "undefined" ? site.url : window.location.origin + window.location.pathname;
+
+export const shareSelf = () =>
+  shareUrl(pageUrl(), `${site.name} · Sites e sistemas`, "Sites, lojas virtuais e sistemas sob medida no Marajó.");
 
 export function useMedia(query: string) {
   const [match, setMatch] = useState(() =>
@@ -87,30 +101,65 @@ export const useReducedMotion = () => {
 };
 export const useFinePointer = () => useMedia("(hover: hover) and (pointer: fine)");
 
-/** Hora de Breves, atualizada a cada segundo, e se estou no horário de resposta. */
-export function useBrevesClock() {
-  const read = () => {
-    const parts = new Intl.DateTimeFormat("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: site.timeZone,
-    }).formatToParts(new Date());
-    const h = parts.find((p) => p.type === "hour")?.value ?? "00";
-    const m = parts.find((p) => p.type === "minute")?.value ?? "00";
-    const hour = Number(h) % 24;
-    return {
-      time: `${h.padStart(2, "0")}:${m}`,
-      online: hour >= site.hours.from && hour < site.hours.to,
-    };
+/* ------------------------------------------------------------------ */
+/* relógio de Breves — um único timer para a página inteira            */
+/* ------------------------------------------------------------------ */
+
+function readClock() {
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: site.timeZone,
+  }).formatToParts(new Date());
+  const h = parts.find((p) => p.type === "hour")?.value ?? "00";
+  const m = parts.find((p) => p.type === "minute")?.value ?? "00";
+  const hour = Number(h) % 24;
+  return {
+    time: `${h.padStart(2, "0")}:${m}`,
+    online: hour >= site.hours.from && hour < site.hours.to,
   };
-  const [state, setState] = useState(read);
+}
+
+let clock = readClock();
+const listeners = new Set<(c: typeof clock) => void>();
+let timer = 0;
+
+function schedule() {
+  window.clearTimeout(timer);
+  // acorda só na virada do minuto — nada de re-render a cada segundo
+  const ms = 60_000 - (Date.now() % 60_000) + 50;
+  timer = window.setTimeout(() => {
+    clock = readClock();
+    listeners.forEach((l) => l(clock));
+    schedule();
+  }, ms);
+}
+
+/** Hora de Breves e se estou no horário de resposta. */
+export function useBrevesClock() {
+  const [state, setState] = useState(clock);
   useEffect(() => {
-    const id = setInterval(() => setState(read()), 1000);
-    return () => clearInterval(id);
+    listeners.add(setState);
+    if (listeners.size === 1) schedule();
+    // a aba volta do segundo plano: confere a hora na hora
+    const onVis = () => {
+      if (document.hidden) return;
+      clock = readClock();
+      listeners.forEach((l) => l(clock));
+    };
+    document.addEventListener("visibilitychange", onVis);
+    setState(readClock());
+    return () => {
+      listeners.delete(setState);
+      if (!listeners.size) window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
   return state;
 }
+
+/* ------------------------------------------------------------------ */
 
 /** Liga a "lanterna" (.lantern) no ponto do ponteiro. Funciona com dedo também. */
 export const lanternHandlers = {
@@ -130,10 +179,17 @@ export const lanternHandlers = {
   onPointerUp(e: PointerEvent<HTMLElement>) {
     if (e.pointerType !== "mouse") {
       const el = e.currentTarget;
-      setTimeout(() => el.style.setProperty("--lit", "0"), 380);
+      window.setTimeout(() => el.style.setProperty("--lit", "0"), 380);
     }
   },
 };
 
 export const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+
+/** Rola até uma seção respeitando "reduzir movimento". */
+export function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+}

@@ -6,6 +6,36 @@
    se ramificam, pulsos que descem. Aqui eles descem junto com o dedo.
 ================================================================== */
 
+/* fontes da própria página — sem ida ao Google, sem travar a primeira tela */
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("./assets/fonts/fraunces.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Fraunces";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("./assets/fonts/fraunces-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./assets/fonts/inter-tight.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("./assets/fonts/jetbrains-mono.woff2") format("woff2");
+}
+
 @theme {
   --color-abyss: #02050a;
   --color-ink: #04080c;
@@ -19,7 +49,8 @@
 
   --color-bone: #e9f0ef;
   --color-mist: #90a3a5;
-  --color-dim: #5d6e71;
+  /* 5,7:1 sobre o fundo — legível em texto pequeno (WCAG AA) */
+  --color-dim: #7a8b8e;
 
   --color-brass: #e0ac5c;
   --color-brass-hot: #f5c880;
@@ -45,6 +76,7 @@
   html {
     /* no celular, overflow só no body não impede a página de alargar */
     overflow-x: clip;
+    scrollbar-gutter: stable;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     background-color: var(--color-ink);
@@ -57,7 +89,8 @@
     font-weight: 380;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
+    /* nada de overflow aqui: com o html em overflow-x:clip, isso transformaria
+       o body num contêiner de rolagem e quebraria todo position:sticky */
     overscroll-behavior-y: none;
   }
 
@@ -65,7 +98,6 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    font-optical-sizing: auto;
     font-weight: 400;
     letter-spacing: -0.024em;
     line-height: 1.02;
@@ -84,6 +116,10 @@
   :focus-visible {
     outline: 2px solid var(--color-brass);
     outline-offset: 3px;
+  }
+
+  input::placeholder {
+    color: var(--color-dim);
   }
 
   ::-webkit-scrollbar {
@@ -119,14 +155,24 @@
   .eyebrow-mist {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--color-dim);
   }
 
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* seções: o topo fica livre quando o dock leva até elas */
+  .anchor {
+    scroll-margin-top: 1.25rem;
+  }
+
   /* coluna do perfil: fixa ao lado no desktop quando a tela tem altura */
-  @media (min-width: 1024px) and (min-height: 800px) {
+  @media (min-width: 1024px) and (min-height: 820px) {
     .side {
       position: sticky;
       top: 0;
@@ -136,25 +182,19 @@
       justify-content: center;
     }
   }
-  @media (min-width: 1024px) and (max-height: 799.98px) {
+  @media (min-width: 1024px) and (max-height: 819.98px) {
     .side {
       padding-block: 4rem;
     }
   }
 
-  .tabular {
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum";
-  }
-
-  /* painel com lanterna: a luz segue o dedo/cursor por --mx/--my */
+  /* painel com lanterna: a luz segue o dedo/cursor por --mx/--my.
+     Sem backdrop-filter — desfoque atrás de card que rola é o que mais pesa no celular. */
   .lantern {
     position: relative;
     isolation: isolate;
-    background: color-mix(in oklab, var(--color-surface) 72%, transparent);
+    background: color-mix(in oklab, var(--color-surface) 88%, transparent);
     border: 1px solid var(--color-line);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
   }
   .lantern::before {
     content: "";
@@ -171,7 +211,6 @@
       transparent 70%
     );
   }
-  /* borda que acende só perto do ponteiro */
   .lantern::after {
     content: "";
     position: absolute;
@@ -195,17 +234,59 @@
       linear-gradient(#000 0 0) content-box exclude,
       linear-gradient(#000 0 0);
   }
+
+  /* chip selecionável (simulador, orçamento) */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    padding: 0.55rem 0.9rem;
+    font-size: 0.8125rem;
+    color: var(--color-mist);
+    transition:
+      border-color 0.25s,
+      background-color 0.25s,
+      color 0.25s,
+      transform 0.15s;
+  }
+  .chip:active {
+    transform: scale(0.96);
+  }
+  .chip[aria-pressed="true"] {
+    border-color: var(--color-brass);
+    background: var(--color-brass);
+    color: var(--color-abyss);
+  }
+
+  /* trilho horizontal com rolagem por arraste (chips do simulador) */
+  .rail {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+  }
 }
 
 /* ---------- atmosfera ---------- */
 
+/* granulado sem mix-blend-mode: mesclar a tela inteira a cada quadro custava caro */
 @utility grain-layer {
   position: fixed;
   inset: 0;
   z-index: 90;
   pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -217,18 +298,8 @@
     linear-gradient(to right, rgba(63, 183, 159, 0.045) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(63, 183, 159, 0.045) 1px, transparent 1px);
   background-size: 56px 56px;
-  mask-image: radial-gradient(
-    120% 80% at 50% 0%,
-    black 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    transparent 90%
-  );
-  -webkit-mask-image: radial-gradient(
-    120% 80% at 50% 0%,
-    black 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    transparent 90%
-  );
+  mask-image: radial-gradient(120% 80% at 50% 0%, black 0%, rgba(0, 0, 0, 0.4) 50%, transparent 90%);
+  -webkit-mask-image: radial-gradient(120% 80% at 50% 0%, black 0%, rgba(0, 0, 0, 0.4) 50%, transparent 90%);
 }
 
 /* ---------- movimento ---------- */
@@ -263,7 +334,6 @@
   }
 }
 
-/* o brilho que atravessa o botão principal de tempos em tempos */
 @keyframes sheen {
   0%,
   62% {
@@ -274,7 +344,6 @@
   }
 }
 
-/* varredura do sonar passando pela foto */
 @keyframes scan {
   0% {
     transform: translateY(-120%);
@@ -292,6 +361,49 @@
   50% {
     transform: translateX(5px);
   }
+}
+
+@keyframes nudge-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* a fita para quando sai da tela (economia de bateria) */
+.marquee.is-paused [data-track] {
+  animation-play-state: paused !important;
 }
 
 .animate-spin-slow {
@@ -317,6 +429,15 @@
 }
 .animate-nudge {
   animation: nudge 1.6s ease-in-out infinite;
+}
+.animate-nudge-y {
+  animation: nudge-y 1.6s ease-in-out infinite;
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+.animate-shimmer {
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

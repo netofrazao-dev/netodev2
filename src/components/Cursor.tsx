@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
+import {
+  AnimatePresence,
+  m,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import { useFinePointer } from "../lib/utils";
 
 /**
@@ -61,12 +66,12 @@ export default function Cursor() {
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-[95]">
-      <motion.div
+      <m.div
         className="absolute left-0 top-0"
         style={{ x: rx, y: ry }}
         animate={{ opacity: visible ? 1 : 0 }}
       >
-        <motion.div
+        <m.div
           className="flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-brass/60"
           animate={{
             width: size,
@@ -79,7 +84,7 @@ export default function Cursor() {
         >
           <AnimatePresence mode="wait">
             {label && (
-              <motion.span
+              <m.span
                 key={label}
                 initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -88,20 +93,20 @@ export default function Cursor() {
                 className="font-mono text-[0.625rem] font-medium uppercase tracking-[0.14em] text-abyss"
               >
                 {label}
-              </motion.span>
+              </m.span>
             )}
           </AnimatePresence>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         className="absolute left-0 top-0"
         style={{ x, y }}
         animate={{ opacity: visible && !label ? 1 : 0 }}
         transition={{ duration: 0.15 }}
       >
         <div className="h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brass-hot" />
-      </motion.div>
+      </m.div>
     </div>
   );
 }
