@@ -6,7 +6,7 @@ import { EASE_IN_OUT } from "../lib/utils";
 
 /**
  * Texto em que cada caractere rola sozinho quando muda — o relógio de
- * Breves e o preço do orçamento usam (efeito odômetro). Leitores de tela
+ * Breves e o prazo do orçamento usam (efeito odômetro). Leitores de tela
  * recebem o texto inteiro, sem os pedaços animados.
  */
 export default function Rolling({ text, className = "" }: { text: string; className?: string }) {

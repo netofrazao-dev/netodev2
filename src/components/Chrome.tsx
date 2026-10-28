@@ -27,7 +27,7 @@ export function ScrollProgress() {
 const ITEMS = [
   { id: "projetos", label: "Projetos", icon: LayoutGrid },
   { id: "simular", label: "Simular", icon: WandSparkles },
-  { id: "orcamento", label: "Preço", icon: Calculator },
+  { id: "orcamento", label: "Orçar", icon: Calculator },
   { id: "duvidas", label: "Dúvidas", icon: CircleHelp },
 ] as const;
 
@@ -45,7 +45,7 @@ function useSpy(enabled: boolean) {
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= mid) current = id;
       }
-      // "como funciona" fica junto de "preço" no dock
+      // "como funciona" fica junto de "orçar" no dock
       setActive(current === "processo" ? "orcamento" : current);
     };
     const onScroll = () => {

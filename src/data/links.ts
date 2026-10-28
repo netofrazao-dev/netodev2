@@ -43,7 +43,7 @@ export const site = {
    * O que você está fazendo agora — aparece num card "AGORA" no topo.
    * Deixe "" para esconder.
    */
-  now: "Finalizando um sistema para a UPA 24h de Breves",
+  now: "",
 } as const;
 
 export function whatsappLink(message: string) {
@@ -87,7 +87,7 @@ export const links: LinkItem[] = [
   {
     kind: "portfolio",
     title: "Portfólio completo",
-    detail: "processo, preços e estudos de caso",
+    detail: "processo e estudos de caso",
     href: site.portfolio,
     cursor: "abrir",
   },
@@ -149,16 +149,16 @@ export type Project = {
 
 export const projects: Project[] = [
   /*
-   * Modelo para o sistema da UPA 24h quando estiver pronto — é só tirar o
-   * comentário e ajustar o texto. `private: true` esconde qualquer link.
+   * Modelo para um sistema interno (de cliente que não pode ter link) — é só
+   * tirar o comentário e ajustar o texto. `private: true` esconde qualquer link.
    *
   {
-    slug: "upa-24h",
-    name: "UPA 24h Breves",
+    slug: "sistema-interno",
+    name: "Nome do sistema",
     kicker: "…",
-    type: "Sistema de saúde",
+    type: "Sistema interno",
     category: "sistema",
-    client: "UPA 24h · Breves, PA",
+    client: "Cliente · Breves, PA",
     summary: "…",
     hues: ["#3fb79f", "#1d5b52"],
     private: true,

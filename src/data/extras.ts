@@ -5,7 +5,7 @@
  */
 
 /* ------------------------------------------------------------------ */
-/* orçamento — mesmos preços do portfólio                              */
+/* orçamento — tipo, recursos e prazo; o valor é combinado na conversa */
 /* ------------------------------------------------------------------ */
 
 export type Kind = "site" | "loja" | "sistema";
@@ -17,7 +17,6 @@ export const kinds: {
   hint: string;
   pitch: string;
   includes: string[];
-  base: number;
   weeks: [number, number];
 }[] = [
   {
@@ -33,7 +32,6 @@ export const kinds: {
       "Cadastro no Google Meu Negócio",
       "Abre bem no celular e no computador",
     ],
-    base: 350,
     weeks: [1, 2],
   },
   {
@@ -49,7 +47,6 @@ export const kinds: {
       "Pedido formatado direto no WhatsApp",
       "Abre bem no celular e no computador",
     ],
-    base: 520,
     weeks: [2, 3],
   },
   {
@@ -65,26 +62,23 @@ export const kinds: {
       "Treino da equipe na entrega",
       "30 dias de ajuste inclusos",
     ],
-    base: 700,
     weeks: [3, 6],
   },
 ];
 
-export const features: { id: string; label: string; price: number; for: Kind[] }[] = [
-  { id: "catalogo", label: "Catálogo de produtos", price: 70, for: ["site", "loja"] },
-  { id: "pix", label: "Pagamento por PIX", price: 55, for: ["loja", "sistema"] },
-  { id: "whats", label: "Pedido direto no WhatsApp", price: 40, for: ["site", "loja"] },
-  { id: "admin", label: "Painel para você mesmo editar", price: 90, for: ["site", "loja", "sistema"] },
-  { id: "login", label: "Área de login para clientes", price: 80, for: ["loja", "sistema"] },
-  { id: "estoque", label: "Controle de estoque", price: 110, for: ["loja", "sistema"] },
-  { id: "relatorios", label: "Relatórios e gráficos", price: 95, for: ["loja", "sistema"] },
-  { id: "agenda", label: "Agendamento de horário", price: 90, for: ["site", "sistema"] },
-  { id: "blog", label: "Blog ou página de notícias", price: 50, for: ["site"] },
-  { id: "equipe", label: "Vários usuários com permissões", price: 85, for: ["sistema"] },
+export const features: { id: string; label: string; for: Kind[] }[] = [
+  { id: "catalogo", label: "Catálogo de produtos", for: ["site", "loja"] },
+  { id: "pix", label: "Pagamento por PIX", for: ["loja", "sistema"] },
+  { id: "whats", label: "Pedido direto no WhatsApp", for: ["site", "loja"] },
+  { id: "admin", label: "Painel para você mesmo editar", for: ["site", "loja", "sistema"] },
+  { id: "login", label: "Área de login para clientes", for: ["loja", "sistema"] },
+  { id: "estoque", label: "Controle de estoque", for: ["loja", "sistema"] },
+  { id: "relatorios", label: "Relatórios e gráficos", for: ["loja", "sistema"] },
+  { id: "agenda", label: "Agendamento de horário", for: ["site", "sistema"] },
+  { id: "blog", label: "Blog ou página de notícias", for: ["site"] },
+  { id: "equipe", label: "Vários usuários com permissões", for: ["sistema"] },
 ];
 
-/** Urgência: +25% no preço e uma semana a menos. */
-export const RUSH = 1.25;
 
 /* ------------------------------------------------------------------ */
 /* simulador "seu negócio online"                                      */
@@ -272,7 +266,7 @@ export const processSteps = [
 export const faq = [
   {
     q: "Quanto custa?",
-    a: "Site institucional começa em R$ 350 e costuma fechar perto de R$ 500. Loja virtual começa em R$ 520, com média de R$ 850. Sistema sob medida começa em R$ 700, com média de R$ 1.100. Monte o seu no orçamento aqui em cima e tenha uma faixa em 30 segundos.",
+    a: "Depende do que o seu negócio precisa, por isso o valor é sempre combinado comigo depois de uma conversa rápida. Você recebe a proposta por escrito, com o preço fechado, antes de qualquer coisa começar. Monte o seu projeto aqui em cima e me mande no WhatsApp.",
   },
   {
     q: "Em quanto tempo fica pronto?",
@@ -280,7 +274,7 @@ export const faq = [
   },
   {
     q: "Tem mensalidade?",
-    a: "O site é seu, pago uma vez. O único custo fixo é o domínio próprio (seunegocio.com.br), cerca de R$ 40 por ano. Se quiser que eu cuide de tudo e faça alterações quando precisar, a manutenção é R$ 60 por mês — opcional e sem fidelidade.",
+    a: "O site é seu, pago uma vez. O único custo fixo é o domínio próprio (seunegocio.com.br), pago uma vez por ano. Se quiser que eu cuide de tudo e faça alterações quando precisar, tem a manutenção mensal — opcional, sem fidelidade e com valor combinado comigo.",
   },
   {
     q: "Você atende pessoalmente?",

@@ -24,8 +24,8 @@ npm run preview  # serve o build
 - **Simulador** "Seu negócio, online": a pessoa digita o nome, escolhe o ramo e a cor e
   vê uma prévia do site; manda pronto no WhatsApp ou compartilha a prévia por link
   (`…/?nome=…&tipo=…&cor=…#simular`).
-- **Orçamento** em 30 segundos (mesmos preços do portfólio), com o resultado preso no
-  rodapé da tela enquanto a pessoa marca as opções.
+- **Orçamento** em 30 segundos: tipo, recursos e prazo, com o resumo preso no rodapé da
+  tela. Não mostra valores — a pessoa manda tudo no WhatsApp e o preço é combinado na conversa.
 - **Como funciona**, **Dúvidas**, fita de tecnologias e o convite final.
 - **Dock** no celular (atalhos + WhatsApp no centro) e **"voltar" do celular** fechando
   qualquer gaveta.
@@ -36,7 +36,7 @@ npm run preview  # serve o build
 - **`src/data/links.ts`** — contatos, frases do topo, card "AGORA" (`site.now`), links e
   **projetos** (prints em `public/projetos/`).
 - **`src/data/extras.ts`** — simulador (ramos e cores), orçamento (tipos, recursos e
-  preços), passos do "Como funciona" e dúvidas.
+  prazos), passos do "Como funciona" e dúvidas.
 
 Detalhes dos projetos:
 
@@ -45,7 +45,7 @@ Detalhes dos projetos:
 - `mobile`: print do celular (página longa) — aparece rolável dentro do celular na gaveta.
 - `category`: `site`, `loja` ou `sistema` (filtro).
 - `private: true`: sistema interno — selo "Privado", sem link e sem print real. Há um
-  modelo comentado para o sistema da UPA 24h no topo da lista.
+  modelo comentado no topo da lista.
 - **Salvar contato**: o cartão é o arquivo `public/neto-frazao.vcf`.
 - **Portfólio completo**: quando o netofrazao.com.br estiver no ar, preencha
   `portfolio: "https://netofrazao.com.br"` — o card e os botões "Estudo de caso" aparecem.

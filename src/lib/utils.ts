@@ -184,9 +184,6 @@ export const lanternHandlers = {
   },
 };
 
-export const brl = (n: number) =>
-  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-
 /** Rola até uma seção respeitando "reduzir movimento". */
 export function scrollToId(id: string) {
   const el = document.getElementById(id);

@@ -5,18 +5,18 @@ import {
 } from "framer-motion";
 import { Check, LayoutDashboard, Monitor, Plus, ShoppingBag } from "lucide-react";
 import { whatsappLink } from "../data/links";
-import { features, kinds, RUSH, type Kind } from "../data/extras";
-import { EASE, brl, haptic } from "../lib/utils";
+import { features, kinds, type Kind } from "../data/extras";
+import { EASE, haptic } from "../lib/utils";
 import { WhatsappIcon } from "./icons";
 import Rolling from "./Rolling";
 import { SectionHead } from "./Section";
 
 const KIND_ICON = { site: Monitor, loja: ShoppingBag, sistema: LayoutDashboard } as const;
-const round10 = (n: number) => Math.round(n / 10) * 10;
 
 /**
- * Orçamento em 30 segundos — mesmos preços e recursos do portfólio. O
- * resultado fica preso no rodapé da tela enquanto a pessoa marca as opções.
+ * Orçamento em 30 segundos: tipo, recursos e prazo. Não mostra valores — o
+ * preço é sempre combinado na conversa. O resumo fica preso no rodapé da
+ * tela enquanto a pessoa marca as opções.
  */
 export default function Estimator() {
   const [kind, setKind] = useState<Kind>("loja");
@@ -27,14 +27,13 @@ export default function Estimator() {
   const available = useMemo(() => features.filter((f) => f.for.includes(kind)), [kind]);
   const active = useMemo(() => available.filter((f) => picked.includes(f.id)), [available, picked]);
 
-  const estimate = useMemo(() => {
-    const raw = cfg.base + active.reduce((sum, f) => sum + f.price, 0);
-    const total = rush ? raw * RUSH : raw;
+  const weeks = useMemo(() => {
     const extra = Math.floor(active.length / 4);
     const min = Math.max(1, cfg.weeks[0] + extra - (rush ? 1 : 0));
     const max = Math.max(min + 1, cfg.weeks[1] + extra - (rush ? 1 : 0));
-    return { low: round10(total), high: round10(total * 1.2), weeks: [min, max] as const };
+    return [min, max] as const;
   }, [cfg, active, rush]);
+  const summary = `${cfg.short} · ${active.length ? `${active.length} ${active.length > 1 ? "recursos" : "recurso"}` : "o básico"}${rush ? " · com pressa" : ""}`;
 
   const toggle = (id: string) => {
     haptic(6);
@@ -46,10 +45,9 @@ export default function Estimator() {
     "",
     `• Tipo: ${cfg.label}`,
     `• Recursos: ${active.length ? active.map((f) => f.label).join(", ") : "o básico mesmo"}`,
-    `• Prazo: ${rush ? "preciso pra ontem" : "prazo normal"}`,
-    `• Faixa que apareceu: ${brl(estimate.low)} a ${brl(estimate.high)}`,
+    `• Prazo: ${weeks[0]} a ${weeks[1]} semanas${rush ? " (preciso pra ontem)" : ""}`,
     "",
-    "Podemos conversar?",
+    "Podemos conversar e combinar o valor?",
   ].join("\n");
 
   return (
@@ -57,8 +55,8 @@ export default function Estimator() {
       <SectionHead
         id="orcamento-title"
         n="04"
-        title="Quanto custa"
-        sub="Marque o que o seu negócio precisa. Em 30 segundos você tem uma faixa de valor e de prazo — e manda tudo pronto no meu WhatsApp."
+        title="Monte seu projeto"
+        sub="Marque o que o seu negócio precisa e veja o prazo na hora. O valor a gente acerta conversando — você manda tudo pronto no meu WhatsApp."
       />
 
       {/* tipo */}
@@ -87,7 +85,9 @@ export default function Estimator() {
               )}
               <Icon size={18} className={`relative ${on ? "text-brass" : "text-mist"}`} />
               <span className={`relative text-[0.95rem] font-medium ${on ? "text-brass" : "text-bone"}`}>{k.short}</span>
-              <span className="relative font-mono text-[0.625rem] tracking-[0.04em] text-dim">{brl(k.base)}+</span>
+              <span className="relative font-mono text-[0.625rem] tracking-[0.04em] text-dim">
+                {k.weeks[0]}–{k.weeks[1]} sem
+              </span>
             </button>
           );
         })}
@@ -151,7 +151,6 @@ export default function Estimator() {
                   </AnimatePresence>
                 </span>
                 {f.label}
-                <span className={`font-mono text-[0.625rem] ${on ? "text-abyss/70" : "text-dim"}`}>+{f.price}</span>
               </m.button>
             );
           })}
@@ -165,7 +164,7 @@ export default function Estimator() {
       <div className="mt-3 flex flex-wrap gap-2" role="group" aria-labelledby="orc-prazo">
         {[
           { id: false, label: "Prazo normal" },
-          { id: true, label: "Preciso pra ontem (+25%)" },
+          { id: true, label: "Preciso pra ontem" },
         ].map((o) => (
           <button
             key={String(o.id)}
@@ -192,19 +191,20 @@ export default function Estimator() {
           />
           <div className="relative flex items-end justify-between gap-3">
             <div className="min-w-0">
-              <p className="eyebrow-mist">Faixa estimada</p>
+              <p className="eyebrow-mist">Prazo estimado</p>
               <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 font-display text-[1.65rem] leading-none text-brass">
-                <Rolling text={brl(estimate.low)} />
+                <Rolling text={String(weeks[0])} />
                 <span className="text-[1rem] text-mist">a</span>
-                <Rolling text={brl(estimate.high)} className="text-bone" />
+                <Rolling text={String(weeks[1])} className="text-bone" />
+                <span className="text-[1rem] text-mist">semanas</span>
               </p>
               <p className="mt-2 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-dim">
-                {estimate.weeks[0]} a {estimate.weeks[1]} semanas · 50% + 50%
+                {summary} · valor a combinar
               </p>
             </div>
           </div>
           <p className="sr-only" aria-live="polite">
-            Estimativa de {brl(estimate.low)} a {brl(estimate.high)}, em {estimate.weeks[0]} a {estimate.weeks[1]} semanas.
+            {summary}: prazo de {weeks[0]} a {weeks[1]} semanas. O valor é combinado na conversa.
           </p>
           <m.a
             href={whatsappLink(message)}
@@ -219,12 +219,12 @@ export default function Estimator() {
               aria-hidden
               className="animate-sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent"
             />
-            <WhatsappIcon size={17} /> Mandar este orçamento
+            <WhatsappIcon size={17} /> Mandar e combinar o valor
           </m.a>
         </div>
       </div>
       <p className="mt-3 text-[0.6875rem] leading-relaxed text-dim">
-        Estimativa automática, só para você se situar. O valor fechado sai por escrito depois da conversa — e não muda depois.
+        O prazo é uma estimativa automática. O valor a gente acerta na conversa e ele sai por escrito na proposta — e não muda depois.
       </p>
     </section>
   );
