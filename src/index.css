@@ -276,6 +276,27 @@
   .rail > * {
     scroll-snap-align: start;
   }
+
+  /* mini-site do simulador: estilo e tema só trocam variáveis (ver sim/shared.ts) */
+  .sim-site,
+  .sim-site * {
+    transition-property: background-color, border-color, color, border-radius;
+    transition-duration: 0.45s;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sim-h {
+    font-family: var(--hf, var(--font-sans));
+    font-weight: var(--hw, 700);
+    text-transform: var(--ht, none);
+    letter-spacing: var(--hs, -0.02em);
+  }
+  .sim-scroll {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .sim-scroll::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ---------- atmosfera ---------- */

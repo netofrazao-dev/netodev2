@@ -21,9 +21,13 @@ npm run preview  # serve o build
 - **Projetos**: filtro Sites / Lojas / Sistemas, carrossel de arrastar e gaveta com
   **o site rolando dentro de um celular**, botão "próximo projeto" e link direto
   (`…/#projeto=apham`).
-- **Simulador** "Seu negócio, online": a pessoa digita o nome, escolhe o ramo e a cor e
-  vê uma prévia do site; manda pronto no WhatsApp ou compartilha a prévia por link
-  (`…/?nome=…&tipo=…&cor=…#simular`).
+- **Simulador** "Seu negócio, online": a pessoa digita o nome e escolhe ramo, cor (ou
+  qualquer cor), estilo e tema. O site dentro do celular **funciona**: catálogo, sacola,
+  horário/entrega e o pedido chegando no WhatsApp do negócio, com resposta. Tem
+  demonstração automática ("Ver um pedido chegando"), "Surpreenda-me", o endereço
+  sugerido e "Onde o seu negócio aparece" (busca, link no WhatsApp e computador).
+  Manda tudo pronto no WhatsApp ou compartilha por link
+  (`…/?nome=…&tipo=…&cor=…&estilo=…&tema=…#simular`).
 - **Orçamento** em 30 segundos: tipo, recursos e prazo, com o resumo preso no rodapé da
   tela. Não mostra valores — a pessoa manda tudo no WhatsApp e o preço é combinado na conversa.
 - **Como funciona**, **Dúvidas**, fita de tecnologias e o convite final.
@@ -35,7 +39,7 @@ npm run preview  # serve o build
 
 - **`src/data/links.ts`** — contatos, frases do topo, card "AGORA" (`site.now`), links e
   **projetos** (prints em `public/projetos/`).
-- **`src/data/extras.ts`** — simulador (ramos e cores), orçamento (tipos, recursos e
+- **`src/data/extras.ts`** — simulador (ramos, cores, produtos de exemplo e respostas), orçamento (tipos, recursos e
   prazos), passos do "Como funciona" e dúvidas.
 
 Detalhes dos projetos:

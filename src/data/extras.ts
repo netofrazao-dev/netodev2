@@ -95,15 +95,36 @@ export const swatches = [
 
 export type SwatchId = (typeof swatches)[number]["id"];
 
+export type StyleId = "moderno" | "classico" | "ousado";
+
+export const looks: { id: StyleId; label: string }[] = [
+  { id: "moderno", label: "Moderno" },
+  { id: "classico", label: "Clássico" },
+  { id: "ousado", label: "Ousado" },
+];
+
 export type Segment = {
   id: string;
   label: string;
   /** Nome do ícone (ver Simulator.tsx). */
   icon: "padaria" | "acai" | "roupas" | "barbearia" | "restaurante" | "mercadinho" | "farmacia" | "pousada";
+  /** Nome usado pelo "Surpreenda-me". */
+  example: string;
   headline: string;
   sub: string;
   cta: string;
   section: string;
+  /** Aba da lista completa e aba do pedido, dentro do celular. */
+  catalog: string;
+  bag: string;
+  /** Botão que manda o pedido. */
+  action: string;
+  /** Primeira linha da mensagem que o cliente manda. */
+  intro: string;
+  /** Escolha extra no fim do pedido (horário, entrega, chegada). */
+  slot: { label: string; options: string[] };
+  /** Resposta do negócio — `{slot}` vira a escolha do cliente. */
+  reply: string;
   items: [string, string][];
   swatch: SwatchId;
 };
@@ -114,14 +135,24 @@ export const segments: Segment[] = [
     id: "padaria",
     label: "Padaria",
     icon: "padaria",
+    example: "Padaria Pão Dourado",
     headline: "Pão quentinho toda manhã",
     sub: "Encomende pelo WhatsApp e retire sem fila.",
     cta: "Encomendar",
     section: "Saindo do forno",
+    catalog: "Cardápio",
+    bag: "Sacola",
+    action: "Encomendar no WhatsApp",
+    intro: "Oi! Vim pelo site e quero encomendar:",
+    slot: { label: "Retirar às", options: ["06:30", "07:30", "17:00"] },
+    reply: "Encomenda anotada! Às {slot} está tudo quentinho te esperando. 🥖",
     items: [
       ["Pão francês (kg)", "R$ 16,90"],
       ["Bolo de chocolate", "R$ 35,00"],
       ["Café da manhã completo", "R$ 18,00"],
+      ["Pão de queijo (10 un.)", "R$ 12,00"],
+      ["Torta de frango (fatia)", "R$ 9,50"],
+      ["Sonho recheado", "R$ 6,00"],
     ],
     swatch: "latao",
   },
@@ -129,14 +160,24 @@ export const segments: Segment[] = [
     id: "acai",
     label: "Açaí",
     icon: "acai",
+    example: "Açaí da Ilha",
     headline: "Açaí grosso, do jeito do Marajó",
     sub: "Peça o litro e receba em casa, geladinho.",
     cta: "Pedir agora",
     section: "Mais pedidos",
+    catalog: "Cardápio",
+    bag: "Sacola",
+    action: "Pedir no WhatsApp",
+    intro: "Oi! Vim pelo site e quero pedir:",
+    slot: { label: "Entrega", options: ["Agora", "Em 1 hora", "À noite"] },
+    reply: "Pedido recebido! Já tá saindo daqui geladinho. 💜",
     items: [
       ["Açaí 1 litro", "R$ 25,00"],
       ["Tigela 500 ml", "R$ 15,00"],
       ["Açaí com farinha", "R$ 18,00"],
+      ["Açaí 2 litros", "R$ 48,00"],
+      ["Tigela com frutas", "R$ 22,00"],
+      ["Farinha de tapioca", "R$ 8,00"],
     ],
     swatch: "acai",
   },
@@ -144,14 +185,24 @@ export const segments: Segment[] = [
     id: "roupas",
     label: "Loja de roupas",
     icon: "roupas",
+    example: "Ateliê Flor de Breves",
     headline: "Moda nova toda semana",
     sub: "Veja o catálogo e separe pelo WhatsApp.",
     cta: "Ver catálogo",
     section: "Chegou agora",
+    catalog: "Catálogo",
+    bag: "Sacola",
+    action: "Separar no WhatsApp",
+    intro: "Oi! Vi no site e quero separar:",
+    slot: { label: "Receber", options: ["Retirar na loja", "Entrega em casa"] },
+    reply: "Separado! Já deixei tudo guardado com o seu nome. 🛍️",
     items: [
       ["Camiseta básica", "R$ 49,90"],
       ["Vestido midi", "R$ 89,90"],
       ["Bermuda jeans", "R$ 69,90"],
+      ["Blusa cropped", "R$ 39,90"],
+      ["Calça wide leg", "R$ 119,90"],
+      ["Sandália rasteira", "R$ 59,90"],
     ],
     swatch: "rosa",
   },
@@ -159,14 +210,24 @@ export const segments: Segment[] = [
     id: "barbearia",
     label: "Barbearia",
     icon: "barbearia",
+    example: "Barbearia do Zé",
     headline: "Corte marcado, sem espera",
     sub: "Escolha o horário e chegue na hora certa.",
     cta: "Agendar horário",
     section: "Serviços",
+    catalog: "Serviços",
+    bag: "Agenda",
+    action: "Agendar no WhatsApp",
+    intro: "Oi! Quero agendar pelo site:",
+    slot: { label: "Horário", options: ["09:00", "10:30", "14:00", "16:30"] },
+    reply: "Fechado! Seu horário das {slot} tá garantido. ✂️",
     items: [
       ["Corte", "R$ 25,00"],
       ["Barba", "R$ 15,00"],
       ["Corte + barba", "R$ 35,00"],
+      ["Pigmentação", "R$ 20,00"],
+      ["Sobrancelha", "R$ 10,00"],
+      ["Corte infantil", "R$ 20,00"],
     ],
     swatch: "jade",
   },
@@ -174,14 +235,24 @@ export const segments: Segment[] = [
     id: "restaurante",
     label: "Restaurante",
     icon: "restaurante",
+    example: "Sabor do Marajó",
     headline: "Almoço caseiro todo dia",
     sub: "Cardápio do dia com entrega no bairro.",
     cta: "Ver cardápio",
     section: "Hoje tem",
+    catalog: "Cardápio",
+    bag: "Pedido",
+    action: "Pedir no WhatsApp",
+    intro: "Oi! Vim pelo site e quero pedir:",
+    slot: { label: "Entregar às", options: ["11:30", "12:00", "12:30"] },
+    reply: "Pedido anotado! Sai às {slot} quentinho. 🍽️",
     items: [
       ["Prato feito", "R$ 20,00"],
       ["Peixe frito", "R$ 35,00"],
       ["Suco natural", "R$ 8,00"],
+      ["Frango assado", "R$ 30,00"],
+      ["Vatapá", "R$ 25,00"],
+      ["Pudim", "R$ 7,00"],
     ],
     swatch: "coral",
   },
@@ -189,14 +260,24 @@ export const segments: Segment[] = [
     id: "mercadinho",
     label: "Mercadinho",
     icon: "mercadinho",
+    example: "Mercadinho Bom Preço",
     headline: "A compra do mês sem sair de casa",
     sub: "Monte a lista e receba na porta.",
     cta: "Fazer pedido",
     section: "Ofertas da semana",
+    catalog: "Ofertas",
+    bag: "Lista",
+    action: "Mandar a lista",
+    intro: "Oi! Montei minha lista no site:",
+    slot: { label: "Entrega", options: ["Hoje à tarde", "Amanhã cedo"] },
+    reply: "Lista recebida! Já estamos separando a sua compra. 🛒",
     items: [
       ["Arroz 5 kg", "R$ 27,90"],
       ["Café 500 g", "R$ 19,90"],
       ["Óleo de soja", "R$ 8,90"],
+      ["Feijão 1 kg", "R$ 9,90"],
+      ["Açúcar 2 kg", "R$ 10,90"],
+      ["Leite 1 litro", "R$ 6,50"],
     ],
     swatch: "jade",
   },
@@ -204,14 +285,24 @@ export const segments: Segment[] = [
     id: "farmacia",
     label: "Farmácia",
     icon: "farmacia",
+    example: "Farmácia Vida",
     headline: "Saúde pertinho de você",
     sub: "Peça e receba em casa, com atendimento rápido.",
     cta: "Falar com a farmácia",
     section: "Mais procurados",
+    catalog: "Produtos",
+    bag: "Sacola",
+    action: "Pedir no WhatsApp",
+    intro: "Oi! Vim pelo site e preciso de:",
+    slot: { label: "Entrega", options: ["Agora", "Retirar no balcão"] },
+    reply: "Recebido! Já estamos separando o seu pedido. 💊",
     items: [
       ["Vitamina C", "R$ 22,90"],
       ["Protetor solar", "R$ 49,90"],
       ["Kit primeiros socorros", "R$ 39,90"],
+      ["Repelente", "R$ 24,90"],
+      ["Soro fisiológico", "R$ 6,90"],
+      ["Termômetro digital", "R$ 29,90"],
     ],
     swatch: "azul",
   },
@@ -219,14 +310,24 @@ export const segments: Segment[] = [
     id: "pousada",
     label: "Pousada",
     icon: "pousada",
+    example: "Pousada Rio Pará",
     headline: "Seu descanso no Marajó",
     sub: "Veja os quartos e reserve direto com a gente.",
     cta: "Reservar",
     section: "Quartos",
+    catalog: "Quartos",
+    bag: "Reserva",
+    action: "Reservar no WhatsApp",
+    intro: "Oi! Quero reservar pelo site:",
+    slot: { label: "Chegada", options: ["Sexta", "Sábado", "Domingo"] },
+    reply: "Reserva anotada para {slot}! Já te mando a confirmação. 🌴",
     items: [
       ["Quarto casal (diária)", "R$ 160,00"],
-      ["Quarto família", "R$ 240,00"],
-      ["Café da manhã", "incluso"],
+      ["Quarto família (diária)", "R$ 240,00"],
+      ["Suíte com varanda", "R$ 200,00"],
+      ["Passeio de barco", "R$ 80,00"],
+      ["Translado do porto", "R$ 30,00"],
+      ["Jantar regional", "R$ 45,00"],
     ],
     swatch: "latao",
   },
