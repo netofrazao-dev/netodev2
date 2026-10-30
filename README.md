@@ -63,8 +63,10 @@ Se no seu PC as animações não aparecem, é porque o Windows está com
 **Configurações → Acessibilidade → Efeitos visuais → Efeitos de animação** desligado.
 Para ver tudo sem mexer no sistema, abra a página com **`?movimento`** no fim.
 
-A abertura (cortina com o monograma) roda uma vez por sessão e vem desenhada no próprio
-HTML — aparece antes do JavaScript.
+A abertura roda uma vez por sessão e vem desenhada no próprio HTML (aparece antes do
+JavaScript): canais de luz saindo do centro como o delta do rio, anel de carregamento com
+contador, monograma com brilho, o nome letra por letra e a cortina abrindo. Um toque (ou
+Enter/Esc) pula. Fica toda em `index.html`; o momento de abrir está em `Intro.tsx`.
 
 ## Leveza
 
