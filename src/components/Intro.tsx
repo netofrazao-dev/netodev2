@@ -7,6 +7,8 @@ declare global {
   interface Window {
     /** Marcado pelo script do <head>, antes da primeira pintura. */
     __spStart?: number;
+    /** A pessoa tocou antes de o JavaScript chegar. */
+    __spTap?: number;
   }
 }
 
@@ -34,7 +36,7 @@ export default function Intro({ onOpen }: { onOpen: () => void }) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " " || e.key === "Escape") open();
     };
-    const wait = Math.max(120, (window.__spStart ?? 0) + SHOW_MS - performance.now());
+    const wait = window.__spTap ? 0 : Math.max(120, (window.__spStart ?? 0) + SHOW_MS - performance.now());
     const t = window.setTimeout(open, wait);
     el.addEventListener("pointerdown", open);
     window.addEventListener("keydown", onKey);

@@ -49,6 +49,8 @@
         try {
           var d = document.documentElement;
           window.__spStart = performance.now();
+          // um toque antes do JavaScript chegar fica guardado: a cortina abre assim que ele chegar
+          document.addEventListener("pointerdown", function () { window.__spTap = 1; }, { once: true, capture: true });
           var forced = /[?&]movimento/.test(location.search);
           if (forced) d.classList.add("motion-full");
           var reduced = !forced && matchMedia("(prefers-reduced-motion: reduce)").matches;
