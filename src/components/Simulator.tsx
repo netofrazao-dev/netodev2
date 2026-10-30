@@ -333,9 +333,9 @@ export default function Simulator() {
         sub="Escreva o nome do seu negócio e brinque à vontade: o site dentro do celular funciona de verdade. Monte um pedido e veja ele chegando no WhatsApp."
       />
 
-      <div className="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-x-8">
+      <div className="xl:grid xl:grid-cols-[15rem_minmax(0,1fr)] xl:items-start xl:gap-x-8">
         {/* o celular */}
-        <div className="lg:sticky lg:top-8">
+        <div className="xl:sticky xl:top-8">
           <div
             className="relative mx-auto w-fit py-2"
             style={{ perspective: 1000 }}
@@ -459,7 +459,7 @@ export default function Simulator() {
             </AnimatePresence>
           </div>
 
-          <div className="mx-auto mt-5 flex max-w-[22rem] gap-2 lg:flex-col">
+          <div className="mx-auto mt-5 flex max-w-[22rem] gap-2 xl:flex-col">
             <m.button
               type="button"
               whileTap={{ scale: 0.96 }}
@@ -481,7 +481,7 @@ export default function Simulator() {
         </div>
 
         {/* controles */}
-        <div className="mt-8 lg:mt-1">
+        <div className="mt-8 xl:mt-1">
           <label htmlFor="sim-nome" className="eyebrow-mist">
             Nome do seu negócio
           </label>

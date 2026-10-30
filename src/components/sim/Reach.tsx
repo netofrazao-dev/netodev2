@@ -17,9 +17,9 @@ type Props = {
 };
 
 const TABS = [
-  { id: "busca", label: "Na busca", icon: Search },
-  { id: "link", label: "No WhatsApp", icon: WhatsappIcon },
-  { id: "pc", label: "No computador", icon: Monitor },
+  { id: "busca", label: "Busca", icon: Search },
+  { id: "link", label: "WhatsApp", icon: WhatsappIcon },
+  { id: "pc", label: "Computador", icon: Monitor },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -30,7 +30,7 @@ type Tab = (typeof TABS)[number]["id"];
 export default function Reach(props: Props) {
   const [tab, setTab] = useState<Tab>("busca");
   return (
-    <div className="mt-10 lg:col-span-2">
+    <div className="mt-10 xl:col-start-2">
       <p className="eyebrow-mist" id="sim-onde">
         Onde o seu negócio aparece
       </p>
