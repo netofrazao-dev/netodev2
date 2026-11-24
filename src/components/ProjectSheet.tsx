@@ -17,7 +17,7 @@ const item = {
 };
 
 /** O site do projeto num celular — dá para rolar com o dedo dentro da tela. */
-function PhonePreview({ src, name }: { src: string; name: string }) {
+function PhonePreview({ src, name, demo }: { src: string; name: string; demo?: boolean }) {
   const [loaded, setLoaded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   return (
@@ -33,7 +33,7 @@ function PhonePreview({ src, name }: { src: string; name: string }) {
           >
             <img
               src={src}
-              alt={`Site ${name} aberto no celular`}
+              alt={`${name} aberto no celular`}
               loading="lazy"
               decoding="async"
               onLoad={() => setLoaded(true)}
@@ -63,7 +63,7 @@ function PhonePreview({ src, name }: { src: string; name: string }) {
         </div>
       </div>
       <figcaption className="mt-3 text-center font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-dim">
-        Como abre no celular
+        Como abre no celular{demo && " · dados fictícios"}
       </figcaption>
     </m.figure>
   );
@@ -179,7 +179,7 @@ export default function ProjectSheet({
                   {p.summary}
                 </m.p>
 
-                {p.mobile && !p.private && <PhonePreview src={p.mobile} name={p.name} />}
+                {p.mobile && <PhonePreview src={p.mobile} name={p.name} demo={p.private} />}
 
                 <m.div variants={item} className="mt-7 grid grid-cols-3 gap-2">
                   {p.results.map((r) => (
@@ -238,7 +238,7 @@ export default function ProjectSheet({
                   {p.private && (
                     <p className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-line-hot px-4 py-3 text-center text-[0.8125rem] text-mist">
                       <Lock size={14} className="shrink-0 text-brass" />
-                      Sistema interno do cliente — sem acesso público.
+                      Sistema interno do cliente, sem acesso público. As imagens usam dados fictícios.
                     </p>
                   )}
                   {!p.private && (p.live || site.portfolio) && (

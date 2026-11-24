@@ -138,8 +138,8 @@ export type Project = {
   /** Link do projeto no ar. Deixe sem para esconder o botão. */
   live?: string;
   /**
-   * Sistema interno de cliente: ganha o selo "Privado", nunca mostra link e,
-   * sem `cover`, usa a capa desenhada (nada de print com dado real).
+   * Sistema interno de cliente: ganha o selo "Privado" e nunca mostra link. Prints
+   * só com dados fictícios (a gaveta avisa); sem `cover`, usa a capa desenhada.
    */
   private?: boolean;
   solution: { title: string; body: string }[];
@@ -204,6 +204,45 @@ export const projects: Project[] = [
       { value: "Brasil", label: "entrega em todo o país" },
       { value: "CEP", label: "frete calculado na hora" },
       { value: "0", label: "comprovante para conferir" },
+    ],
+  },
+  {
+    slug: "regulacao-breves",
+    name: "Regulação Breves",
+    kicker: "Os pacientes que precisam de leito, acompanhados em tempo real",
+    type: "Sistema de saúde",
+    category: "sistema",
+    client: "UPA 24h e Hospital Municipal · Breves, PA",
+    summary:
+      "Sistema da UPA 24h e do Hospital Municipal de Breves para acompanhar cada paciente que precisa de leito em outro hospital: cadastro, painel ao vivo, agendamento de exames, relatórios no timbre da Secretaria de Saúde e indicadores. Cada unidade vê só os próprios pacientes, e tudo o que muda fica registrado.",
+    cover: "/projetos/regulacao-breves.webp",
+    coverSmall: "/projetos/regulacao-breves-640.webp",
+    mobile: "/projetos/regulacao-breves-mobile.webp",
+    hues: ["#2f8f6f", "#1d4f91"],
+    private: true,
+    solution: [
+      {
+        title: "Painel de leitos ao vivo",
+        body: "O quadro \"Controle de Leitos Cadastrados\" se atualiza sozinho em todos os aparelhos quando alguém muda a situação de um paciente, e sai impresso numa folha A4.",
+      },
+      {
+        title: "Duas unidades, dados separados",
+        body: "UPA e Hospital Municipal usam o mesmo sistema, cada um com a sua cor e só com os seus pacientes. As permissões ficam no banco de dados, não só na tela.",
+      },
+      {
+        title: "Relatórios e indicadores",
+        body: "Relação mensal em PDF e Excel no timbre oficial, protocolo de exames com duas vias e gráficos de espera e transferências, sem nome de paciente nos indicadores.",
+      },
+      {
+        title: "Tudo registrado e guardado",
+        body: "Quem cadastrou, atualizou ou excluiu cada coisa, com o antes e o depois. Backup diário criptografado e instalável no celular como app.",
+      },
+    ],
+    stack: ["React", "TypeScript", "Supabase", "Realtime", "jsPDF", "Vercel"],
+    results: [
+      { value: "2", label: "unidades de saúde" },
+      { value: "Ao vivo", label: "painel em todos os aparelhos" },
+      { value: "PDF", label: "relatório no timbre oficial" },
     ],
   },
   {
@@ -274,6 +313,41 @@ export const projects: Project[] = [
       { value: "3", label: "avisos por locação" },
       { value: "LGPD", label: "no fluxo do leitor" },
       { value: "Diário", label: "backup automático" },
+    ],
+  },
+  {
+    slug: "chamada-escolar",
+    name: "Chamada Escolar",
+    kicker: "A chamada da turma no celular, com o relatório do mês pronto",
+    type: "Sistema escolar",
+    category: "sistema",
+    client: "Professores e turmas",
+    summary:
+      "Cada professora entra com a própria conta, cadastra as turmas e os alunos e faz a chamada tocando em Presente ou Ausente. No fim do mês, o relatório sai pronto, com presenças, faltas e a porcentagem de cada aluno, e um calendário mostra os dias em que a chamada foi feita.",
+    cover: "/projetos/chamada-turma.webp",
+    coverSmall: "/projetos/chamada-turma-640.webp",
+    mobile: "/projetos/chamada-turma-mobile.webp",
+    hues: ["#e53935", "#1565c0"],
+    private: true,
+    solution: [
+      {
+        title: "Chamada em segundos",
+        body: "A lista da turma abre na data do dia: um toque em Presente ou Ausente para cada aluno e pronto. Dá para corrigir uma chamada antiga escolhendo a data.",
+      },
+      {
+        title: "Relatório do mês",
+        body: "Presenças, faltas e porcentagem de cada aluno, prontas para exportar em PDF.",
+      },
+      {
+        title: "Calendário de frequência",
+        body: "Cada dia de aula mostra se a chamada foi feita, ficou pela metade ou não foi feita. O mês inteiro aparece de relance.",
+      },
+    ],
+    stack: ["JavaScript", "Supabase", "HTML", "CSS"],
+    results: [
+      { value: "1 toque", label: "por aluno" },
+      { value: "PDF", label: "relatório do mês" },
+      { value: "%", label: "frequência de cada aluno" },
     ],
   },
   {

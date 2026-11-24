@@ -49,7 +49,8 @@ Detalhes dos projetos:
 - `mobile`: print do celular (página longa) — aparece rolável dentro do celular na gaveta.
 - `category`: `site`, `loja` ou `sistema` (filtro).
 - `private: true`: sistema interno — selo "Privado", sem link e sem print real. Há um
-  modelo comentado no topo da lista.
+  modelo comentado no topo da lista. Pode ter prints, desde que só com dados fictícios
+  (a gaveta avisa "dados fictícios").
 - **Salvar contato**: o cartão é o arquivo `public/neto-frazao.vcf`.
 - **Portfólio completo**: quando o netofrazao.com.br estiver no ar, preencha
   `portfolio: "https://netofrazao.com.br"` — o card e os botões "Estudo de caso" aparecem.
