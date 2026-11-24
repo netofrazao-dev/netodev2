@@ -170,12 +170,12 @@ export const projects: Project[] = [
   {
     slug: "apham",
     name: "APHAM",
-    kicker: "Site da associação com loja de vários vendedores",
+    kicker: "Site da associação com loja que entrega em todo o Brasil",
     type: "Site + marketplace",
     category: "loja",
     client: "Associação de handebol · Breves, PA",
     summary:
-      "O site da Associação de Praticantes de Handebol do Marajó: notícias, competições, transmissões ao vivo e uma loja onde a APHAM e outros vendedores anunciam os próprios produtos. A associação cuida de tudo por um painel, sem mexer em código.",
+      "O site da Associação de Praticantes de Handebol do Marajó: notícias, competições, transmissões ao vivo e uma loja onde a APHAM e outros vendedores anunciam os próprios produtos — com frete calculado pelo CEP, pagamento confirmado automaticamente e entrega para todo o Brasil. A associação cuida de tudo por um painel, sem mexer em código.",
     cover: "/projetos/apham.webp",
     coverSmall: "/projetos/apham-640.webp",
     mobile: "/projetos/apham-mobile.webp",
@@ -184,7 +184,11 @@ export const projects: Project[] = [
     solution: [
       {
         title: "Uma loja, vários vendedores",
-        body: "A APHAM e lojistas parceiros vendem no mesmo lugar, cada um com seus produtos. O pedido sai com PIX gerado na hora e página para acompanhar a entrega.",
+        body: "A APHAM e lojistas parceiros vendem no mesmo lugar, cada um com seus produtos, e o cliente acompanha o pedido por uma página própria.",
+      },
+      {
+        title: "Frete e pagamento no automático",
+        body: "O cliente digita o CEP e já vê o frete para qualquer lugar do Brasil. O pagamento é confirmado sozinho: ninguém precisa conferir comprovante para liberar o pedido.",
       },
       {
         title: "Painel para a associação",
@@ -197,9 +201,9 @@ export const projects: Project[] = [
     ],
     stack: ["React", "Vite", "Tailwind", "Supabase", "Resend", "Vercel"],
     results: [
-      { value: "PIX", label: "pago no próprio site" },
-      { value: "Ao vivo", label: "jogos na página" },
-      { value: "Painel", label: "a associação edita tudo" },
+      { value: "Brasil", label: "entrega em todo o país" },
+      { value: "CEP", label: "frete calculado na hora" },
+      { value: "0", label: "comprovante para conferir" },
     ],
   },
   {
